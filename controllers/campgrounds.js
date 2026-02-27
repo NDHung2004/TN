@@ -87,15 +87,38 @@ module.exports.createCampground = async (req, res, next) => {
 };
 
 module.exports.showCampground = async (req, res) => {
-  const campground = await Campground.findById(req.params.id)
-    .populate({ path: "reviews", populate: { path: "author" } })
-    .populate("author");
-  if (!campground) {
-    req.flash("error", "Campground not found!");
-    return res.redirect("/campgrounds");
-  }
-  res.render("campgrounds/show", { campground });
-};
+    // Tìm quán ăn và lấy danh sách review
+    const campground = await Campground.findById(req.params.id).populate({
+        path: 'reviews',
+        populate: { path: 'author' }
+    }).populate('author');
+
+    if (!campground) {
+        req.flash('error', 'Không tìm thấy quán ăn!');
+        return res.redirect('/campgrounds');
+    }
+
+    // --- TÍNH TOÁN THỐNG KÊ AI ---
+    let totalReviews = campground.reviews.length;
+    let positiveCount = 0;
+    let negativeCount = 0;
+
+    for (let r of campground.reviews) {
+        if (r.sentiment === 'positive') positiveCount++;
+        else if (r.sentiment === 'negative') negativeCount++;
+    }
+
+    // Đóng gói thành biến stats để truyền sang giao diện
+    const aiStats = {
+        total: totalReviews,
+        positivePct: totalReviews ? Math.round((positiveCount / totalReviews) * 100) : 0,
+        negativePct: totalReviews ? Math.round((negativeCount / totalReviews) * 100) : 0
+    };
+    // ----------------------------
+
+    // Truyền thêm aiStats vào view
+    res.render('campgrounds/show', { campground, aiStats });
+}
 
 module.exports.renderEditForm = async (req, res) => {
   const { id } = req.params;

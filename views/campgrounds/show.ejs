@@ -55,6 +55,24 @@
             <% } %>
         </div>
         <p class="card-text mt-3"><%=campground.description%></p>
+        <% if (aiStats.total > 0) { %>
+    <div class="card mb-4 shadow-sm border-0 bg-light">
+        <div class="card-body">
+            <h6 class="fw-bold text-primary mb-3"><i class="fas fa-robot"></i>Cảm Xúc Khách Hàng</h6>
+            
+            <div class="d-flex justify-content-between mb-1 small fw-bold">
+                <span class="text-success"><%= aiStats.positivePct %>% Hài lòng</span>
+                <span class="text-danger"><%= aiStats.negativePct %>% Phàn nàn</span>
+            </div>
+            
+            <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: <%= aiStats.positivePct %>%"></div>
+                <div class="progress-bar bg-danger" role="progressbar" style="width: <%= aiStats.negativePct %>%"></div>
+            </div>
+            <small class="text-muted mt-2 d-block">Dựa trên <%= aiStats.total %> đánh giá .</small>
+        </div>
+    </div>
+<% } %>
       </div>
 
       <ul class="list-group list-group-flush">
@@ -112,37 +130,37 @@
 
     <% for(let review of campground.reviews) { %>
     <div class="card mb-3">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-            <h5 class="card-title">Bởi <%=review.author.username %>
-            </h5>
-            <p class="starability-result" data-rating="<%= review.rating %>">
-                Đánh giá: <%= review.rating %> sao
-            </p>
+        <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted d-flex align-items-center">
+                <i class="fas fa-user-circle me-1"></i> <%= review.author.username %>
+                
+                <% if(review.sentiment === 'positive') { %>
+                    <span class="badge bg-success ms-2 rounded-pill"><i class="fas fa-smile"></i> Tích cực</span>
+                <% } else if(review.sentiment === 'negative') { %>
+                    <span class="badge bg-danger ms-2 rounded-pill"><i class="fas fa-frown"></i> Tiêu cực</span>
+                <% } else { %>
+                    <span class="badge bg-secondary ms-2 rounded-pill">Trung lập</span>
+                <% } %>
+            </h6>
             
-        </div>
-        <p class="card-text">Nhận xét: <%= review.body %></p>
-        <% if(currentUser && !review.author.equals(currentUser._id) && !review.isReported) { %>
-                <form action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>/report?_method=PATCH" method="POST" class="d-inline float-end">
-                    <button class="btn btn-sm btn-outline-secondary" title="Báo cáo vi phạm" onclick="return confirm('Bạn muốn báo cáo bình luận này?')">
-                        <i class="fas fa-flag">Báo cáo</i>
-                    </button>
+            <p class="starability-result" data-rating="<%= review.rating %>">Đánh giá: <%= review.rating %> sao</p>
+            
+            <% if(review.isToxic) { %>
+                <div class="alert alert-warning py-2 mb-0" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> Nội dung đã bị ẩn vì vi phạm tiêu chuẩn cộng đồng (chứa ngôn từ thô tục/xúc phạm).
+                </div>
+            <% } else { %>
+                <p class="card-text">Nhận xét: <%= review.body %></p>
+            <% } %>
+            
+            <% if(currentUser && review.author.equals(currentUser._id)) { %>
+                <form action="/campgrounds/<%=campground._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST" class="mt-2">
+                    <button class="btn btn-sm btn-outline-danger">Xóa bình luận</button>
                 </form>
-              <% } %>
-              
-              <% if(review.isReported) { %>
-                  <span class="float-end text-danger small"><i class="fas fa-exclamation-circle"></i> Đã báo cáo</span>
-              <% } %>
-        <% if(currentUser && (review.author.equals(currentUser) || currentUser.role === 'admin')) { %>
-
-        <form action="..." method="POST">
-        <button class="btn btn-sm btn-danger">Xóa Review</button>
-        </form>
-        
-      <% } %>
-      </div>
+            <% } %>
+        </div>
     </div>
-    <% } %>
+<% } %>
   </div>
 </div>
 

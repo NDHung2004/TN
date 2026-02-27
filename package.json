@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "@exortek/express-mongo-sanitize": "^1.1.1",
+    "@google/generative-ai": "^0.24.1",
     "@mapbox/mapbox-sdk": "^0.16.1",
+    "axios": "^1.13.6",
     "bs-custom-file-input": "^1.3.4",
     "cloudinary": "^2.9.0",
     "connect-flash": "^0.1.1",

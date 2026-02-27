@@ -11,6 +11,15 @@ const reviewSchema = new Schema({
   isReported: {
         type: Boolean,
         default: false
+    },
+  sentiment: { 
+        type: String, 
+        enum: ['positive', 'negative', 'neutral'], // Tích cực, Tiêu cực, Bình thường
+        default: 'neutral' 
+  },
+  isToxic: { 
+        type: Boolean, 
+        default: false 
     }
 }, { timestamps: true });
 module.exports = mongoose.model("Review", reviewSchema);

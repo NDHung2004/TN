@@ -1,3 +1,9 @@
+
+# Virtual environment
+ai_server/venv/
+venv/
+
+
 # ========================
 # Node modules
 # ========================
