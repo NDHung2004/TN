@@ -1,0 +1,135 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 p-0">
+            <%- include('../partials/adminSidebar') %>
+        </div>
+
+        <div class="col-md-10 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Quản lý Quán ăn</h1>
+            </div>
+
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link <%= !filter ? 'active' : '' %>" href="/admin/campgrounds">Tất cả</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= filter === 'pending' ? 'active' : '' %>" href="/admin/campgrounds?filter=pending">
+                        Chờ duyệt <span class="badge bg-warning text-dark">!</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= filter === 'approved' ? 'active' : '' %>" href="/admin/campgrounds?filter=approved">Đã duyệt</a>
+                </li>
+            </ul>
+
+            <div class="card shadow">
+                <div class="card-body">
+                    <form action="/admin/campgrounds" method="GET" class="d-flex gap-2">
+            <% if(filter) { %>
+                <input type="hidden" name="filter" value="<%= filter %>">
+            <% } %>
+            
+            <input class="form-control" type="text" name="search" placeholder="Tìm tên quán hoặc địa điểm..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+            <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i> Tìm</button>
+            
+            <% if(typeof search !== 'undefined' && search) { %>
+                <a href="/admin/campgrounds<%= filter ? `?filter=${filter}` : '' %>" class="btn btn-secondary">Xóa lọc</a>
+            <% } %>
+        </form>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên quán</th>
+                                    <th>Người đăng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Nổi bật</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for(let camp of campgrounds) { %>
+                                <tr >
+                                    <td>
+                                        <% if(camp.images.length) { %>
+                                        <img src="<%= camp.images[0].url %>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                                        <% } else { %>
+                                        <span class="text-muted">No img</span>
+                                        <% } %>
+                                    </td>
+
+                                    <td>
+                                        <a href="/campgrounds/<%= camp._id %>" target="_blank" class="text-decoration-none fw-bold">
+                                            <%= camp.title %> <i class="fas fa-external-link-alt small"></i>
+                                        </a>
+                                        <br>
+                                        <small class="text-muted"><%= new Date(camp.createdAt).toLocaleDateString('vi-VN') %></small>
+                                    </td>
+
+                                    <td><%= camp.author ? camp.author.username : 'Unknown' %></td>
+
+                                    <td>
+                                        <form action="/admin/campgrounds/<%= camp._id %>/status?_method=PATCH" method="POST">
+                                            <div class="d-flex gap-1"> <select name="status" class="form-select form-select-sm" 
+                                                    style="width: 130px; border-color: <%= camp.status === 'pending' ? '#ffc107' : (camp.status === 'approved' ? '#198754' : '#dc3545') %>">
+                                                    
+                                                    <option value="pending" <%= camp.status === 'pending' ? 'selected' : '' %>>⏳ Chờ duyệt</option>
+                                                    <option value="approved" <%= camp.status === 'approved' ? 'selected' : '' %>>✅ Đã duyệt</option>
+                                                    <option value="rejected" <%= camp.status === 'rejected' ? 'selected' : '' %>>❌ Từ chối</option>
+                                                </select>
+
+                                                <button class="btn btn-sm btn-primary">Lưu</button>
+                                            </div>
+                                        </form>
+                                    </td>
+
+                                    <td>
+                                        <form action="/admin/campgrounds/<%= camp._id %>/featured?_method=PATCH" method="POST">
+                                            <button class="btn btn-sm <%= camp.isFeatured ? 'btn-warning' : 'btn-outline-secondary' %>" title="Ghim lên trang chủ">
+                                                <i class="fas fa-star">Ghim</i>
+                                            </button>
+                                        </form>
+                                    </td>
+
+                                    <td>
+                                        <a href="/campgrounds/<%= camp._id %>/edit" class="btn btn-sm btn-info text-white" target="_blank"><i class="fas fa-edit">Sửa</i></a>
+                                        <form action="/admin/campgrounds/<%= camp._id %>?_method=DELETE" method="POST" class="d-inline">
+                                            <button class="btn btn-sm btn-danger" onclick="return confirm('Bạn chắc chắn muốn xóa?')"><i class="fas fa-trash">Xóa</i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            
+                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="/admin/campgrounds?page=<%= currentPage - 1 %><%= typeof filter !== 'undefined' && filter ? `&filter=${filter}` : '' %><%= typeof search !== 'undefined' && search ? `&search=${search}` : '' %>">Trước</a>
+                            </li>
+
+                            <% for(let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="/admin/campgrounds?page=<%= i %><%= typeof filter !== 'undefined' && filter ? `&filter=${filter}` : '' %><%= typeof search !== 'undefined' && search ? `&search=${search}` : '' %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                            <% } %>
+
+                            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="/admin/campgrounds?page=<%= currentPage + 1 %><%= typeof filter !== 'undefined' && filter ? `&filter=${filter}` : '' %><%= typeof search !== 'undefined' && search ? `&search=${search}` : '' %>">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

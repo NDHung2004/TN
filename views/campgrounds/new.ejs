@@ -1,0 +1,60 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container dflex justify-content-center align-items-center mt-5">
+  <div class="row">
+    <h1 class="text-center">Thêm quán ăn mới</h1>
+    <div class="col-md-6 offset-md-3">
+      <form action="/campgrounds" method="POST" class="validated-form" novalidate enctype="multipart/form-data">
+
+        <div class="mb-3">
+          <label class="form-label" for="title">Tên quán ăn</label>
+          <input class="form-control" type="text" name="campground[title]" id="title" required />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="location">Địa chỉ</label>
+          <input class="form-control" type="text" name="campground[location]" id="location" required />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="description">Mô tả quán</label>
+          <textarea class="form-control" type="text" name="campground[description]" id="description" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="category">Danh mục</label>
+            <select class="form-select" id="category" name="campground[category]" required>
+                <% if(typeof categories !== 'undefined' && categories.length > 0) { %>
+                    <option value="" disabled selected>-- Chọn loại hình --</option>
+                    <% for(let cat of categories) { %>
+                        <option value="<%= cat.name %>"><%= cat.name %></option>
+                    <% } %>
+                <% } else { %>
+                    <option value="Khác">Khác</option>
+                <% } %>
+            </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="price">Giá trung bình</label>
+          <div class="input-group">
+            <span class="input-group-text" id="price-label">₫</span>
+            <input type="text" id="price" class="form-control" name="campground[price]" placeholder="0" aria-label="Price" aria-describedby="price-label" required />
+          </div>
+        </div>
+
+        <div class="mb-3 custom-file">
+          <label for="images" class="form-label custom-file-label">Chọn hình ảnh</label>
+          <input class="form-control" name="image" type="file" id="images" multiple />
+        </div>
+
+        <div class="mb-3 d-grid gap-2">
+            <button class="btn btn-success">Thêm quán ăn</button>
+        </div>
+
+        <footer>
+          <a href="/campgrounds">Quay lại danh sách</a>
+        </footer>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 p-0">
+            <%- include('../partials/adminSidebar') %>
+        </div>
+
+        <div class="col-md-10 p-4">
+            <h1 class="mb-4"><i class="fas fa-cogs"></i> Cấu hình Giao diện</h1>
+
+            <form action="/admin/settings/general?_method=PUT" method="POST">
+                <div class="row">
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-desktop"></i> Header & Navbar</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tên Website</label>
+                                    <input type="text" class="form-control" name="setting[siteTitle]" value="<%= setting.siteTitle %>">
+                                </div>
+                                
+                                <hr>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Hotline (Trên Menu)</label>
+                                    <input type="text" class="form-control" name="setting[hotline]" value="<%= setting.hotline %>" placeholder="VD: 1900 1000">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Màu nền Menu</label>
+                                    <select class="form-select" name="setting[navColor]">
+                                        <option value="bg-dark" <%= setting.navColor === 'bg-dark' ? 'selected' : '' %>>Màu Đen (Dark)</option>
+                                        <option value="bg-primary" <%= setting.navColor === 'bg-primary' ? 'selected' : '' %>>Màu Xanh (Blue)</option>
+                                        <option value="bg-danger" <%= setting.navColor === 'bg-danger' ? 'selected' : '' %>>Màu Đỏ (Red)</option>
+                                        <option value="bg-success" <%= setting.navColor === 'bg-success' ? 'selected' : '' %>>Màu Xanh lá (Green)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0"><i class="fas fa-shoe-prints"></i>Footer</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Nội dung giới thiệu</label>
+                                    <textarea class="form-control" name="setting[footer][content]" rows="3"><%= setting.footer.content %></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Dòng bản quyền (Copyright)</label>
+                                    <input type="text" class="form-control" name="setting[footer][copyright]" value="<%= setting.footer.copyright %>">
+                                </div>
+                                
+                                <h6 class="text-primary mt-4">Thông tin liên hệ</h6>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Email</label>
+                                        <input type="text" class="form-control form-control-sm" name="setting[footer][email]" value="<%= setting.footer.email %>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Địa chỉ</label>
+                                        <input type="text" class="form-control form-control-sm" name="setting[footer][address]" value="<%= setting.footer.address %>">
+                                    </div>
+                                </div>
+
+                                <h6 class="text-primary mt-4">Mạng xã hội (Link)</h6>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text"><i class="fab fa-facebook"></i></span>
+                                    <input type="text" class="form-control" name="setting[footer][socials][facebook]" value="<%= setting.footer.socials.facebook %>" placeholder="Link Facebook...">
+                                </div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <span class="input-group-text"><i class="fab fa-youtube"></i></span>
+                                    <input type="text" class="form-control" name="setting[footer][socials][youtube]" value="<%= setting.footer.socials.youtube %>" placeholder="Link Youtube...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <div class="d-grid gap-2 col-6 mx-auto mt-3 mb-5">
+                    <button class="btn btn-success btn-lg shadow"><i class="fas fa-save"></i> LƯU CẤU HÌNH</button>
+                </div>
+            </form>
+            
+            </div>
+    </div>
+</div>

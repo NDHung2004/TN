@@ -1,0 +1,83 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 p-0">
+            <%- include('../partials/adminSidebar') %>
+        </div>
+
+        <div class="col-md-10 p-4">
+            <h1>Quản lý Bình luận & Đánh giá</h1>
+
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link <%= !filter ? 'active' : '' %>" href="/admin/reviews">Tất cả</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= filter === 'reported' ? 'active' : '' %>" href="/admin/reviews?filter=reported">
+                        Bị báo cáo <span class="badge bg-danger">!</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 40%">Nội dung</th>
+                                    <th>Đánh giá</th>
+                                    <th>Người đăng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for(let review of reviews) { %>
+                                <tr class="<%= review.isReported ? 'table-warning' : '' %>">
+                                    
+                                    <td>
+                                        <p class="mb-1 text-break"><%= review.body %></p>
+                                        <small class="text-muted">ID: <%= review._id %></small>
+                                    </td>
+
+                                    <td>
+                                        <span class="text-warning fw-bold"><%= review.rating %> <i class="fas fa-star"></i></span>
+                                    </td>
+
+                                    <td><%= review.author ? review.author.username : 'Unknown' %></td>
+
+                                    <td>
+                                        <% if(review.isReported) { %>
+                                            <span class="badge bg-danger">Bị báo cáo</span>
+                                        <% } else { %>
+                                            <span class="badge bg-success">Sạch</span>
+                                        <% } %>
+                                    </td>
+
+                                    <td>
+                                        <% if(review.isReported) { %>
+                                            <form action="/admin/reviews/<%= review._id %>/dismiss?_method=PATCH" method="POST" class="d-inline">
+                                                <button class="btn btn-sm btn-success" title="Giữ lại (Gỡ báo cáo)">
+                                                    <i class="fas fa-check">Giữ lại</i>
+                                                </button>
+                                            </form>
+                                        <% } %>
+
+                                        <form action="/admin/reviews/<%= review._id %>?_method=DELETE" method="POST" class="d-inline">
+                                            <button class="btn btn-sm btn-danger" onclick="return confirm('Xóa vĩnh viễn bình luận này?')" title="Xóa bình luận">
+                                                <i class="fas fa-trash">Xóa</i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

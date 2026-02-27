@@ -1,0 +1,126 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid">
+    <div class="row">
+        
+        <div class="col-md-2 p-0">
+            <%- include('../partials/adminSidebar') %>
+        </div>
+
+        <div class="col-md-10 p-4">
+            <h1 class="mb-4">Dashboard Tổng quan</h1>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary mb-3 shadow h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title">Người dùng</h5>
+                                    <h2 class="display-4 fw-bold"><%= userCount %></h2>
+                                </div>
+                                <i class="fas fa-users fa-4x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card text-white bg-success mb-3 shadow h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title">Quán ăn</h5>
+                                    <h2 class="display-4 fw-bold"><%= campCount %></h2>
+                                </div>
+                                <i class="fas fa-store fa-4x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card text-white bg-warning mb-3 shadow h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title">Đánh giá</h5>
+                                    <h2 class="display-4 fw-bold"><%= reviewCount %></h2>
+                                </div>
+                                <i class="fas fa-comments fa-4x opacity-50"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Tăng trưởng Người dùng (Năm nay)</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="userGrowthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Tỷ lệ Cảm xúc Đánh giá</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="sentimentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // --- BIỂU ĐỒ 1: TĂNG TRƯỞNG USER ---
+    const ctxUser = document.getElementById('userGrowthChart').getContext('2d');
+    const userGrowthChart = new Chart(ctxUser, {
+        type: 'line',
+        data: {
+            labels: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'],
+            datasets: [{
+                label: 'Thành viên mới',
+                data: [<%= monthlyUsers %>], 
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
+        }
+    });
+
+    // --- BIỂU ĐỒ 2: SENTIMENT ANALYSIS ---
+    const ctxSentiment = document.getElementById('sentimentChart').getContext('2d');
+    const sentimentChart = new Chart(ctxSentiment, {
+        type: 'doughnut',
+        data: {
+            labels: ['Tích cực (4-5sao)', 'Trung tính (3sao)', 'Tiêu cực (1-2sao)'],
+            datasets: [{
+                data: [<%= sentimentData %>],
+                backgroundColor: ['#1cc88a', '#f6c23e', '#e74a3b'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+        }
+    });
+</script>

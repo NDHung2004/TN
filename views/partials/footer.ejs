@@ -1,0 +1,96 @@
+<footer class="footer mt-auto py-4 bg-dark text-white border-top border-secondary">
+    <div class="container">
+        <div class="row gy-4">
+            
+            <div class="col-lg-4 col-md-6">
+                <h5 class="fw-bold text-warning mb-3">
+                    <%= (typeof generalSetting !== 'undefined' && generalSetting.siteTitle) ? generalSetting.siteTitle : 'Quán Ăn Việt' %>
+                </h5>
+                <p class="text-white-50 small">
+                    <%= (typeof generalSetting !== 'undefined' && generalSetting.footer.content) ? generalSetting.footer.content : 'Nơi chia sẻ đam mê ẩm thực.' %>
+                </p>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <h5 class="fw-bold text-white mb-3" style="font-size: 1rem;">Thông tin liên hệ</h5>
+                <ul class="list-unstyled text-white-50 small">
+                    <% if(typeof generalSetting !== 'undefined' && generalSetting.footer.address) { %>
+                        <li class="mb-2">Địa chỉ: <%= generalSetting.footer.address %></li>
+                    <% } %>
+                    <% if(typeof generalSetting !== 'undefined' && generalSetting.footer.email) { %>
+                        <li class="mb-2">Email: <%= generalSetting.footer.email %></li>
+                    <% } %>
+                    <% if(typeof generalSetting !== 'undefined' && generalSetting.hotline) { %>
+                        <li class="mb-2">Hotline: <span class="text-warning fw-bold"><%= generalSetting.hotline %></span></li>
+                    <% } %>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-12">
+                <h5 class="fw-bold text-white mb-3" style="font-size: 1rem;">Kết nối</h5>
+                <div class="d-flex gap-2">
+                    <% if(typeof generalSetting !== 'undefined' && generalSetting.footer.socials) { %>
+                        
+                        <% if(generalSetting.footer.socials.facebook) { %>
+                            <a href="<%= generalSetting.footer.socials.facebook %>" class="social-text-btn facebook" target="_blank">FB</a>
+                        <% } %>
+                        
+                        <% if(generalSetting.footer.socials.youtube) { %>
+                            <a href="<%= generalSetting.footer.socials.youtube %>" class="social-text-btn youtube" target="_blank">YTB</a>
+                        <% } %>
+                        
+                        <% if(generalSetting.footer.socials.tiktok) { %>
+                            <a href="<%= generalSetting.footer.socials.tiktok %>" class="social-text-btn tiktok" target="_blank">TikTok</a>
+                        <% } %>
+
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-secondary my-4">
+        <div class="text-center text-white-50 small">
+            <%= (typeof generalSetting !== 'undefined' && generalSetting.footer.copyright) ? generalSetting.footer.copyright : '© 2026 Copyright' %>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* CSS CHO NÚT CHỮ (TEXT BUTTONS) */
+    .social-text-btn {
+        display: inline-block;
+        padding: 5px 12px;       /* Khoảng cách lề chữ */
+        border-radius: 4px;      /* Bo góc nhẹ */
+        font-weight: bold;       /* Chữ đậm */
+        font-size: 0.85rem;      /* Cỡ chữ vừa phải */
+        text-decoration: none;   /* Bỏ gạch chân */
+        color: white;            /* Chữ màu trắng */
+        background-color: #444;  /* Màu nền mặc định (xám tối) */
+        transition: all 0.3s;    /* Hiệu ứng mượt */
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Màu sắc riêng khi di chuột vào từng nút */
+    .social-text-btn.facebook:hover {
+        background-color: #1877F2; /* Xanh FB */
+        border-color: #1877F2;
+        color: white;
+    }
+
+    .social-text-btn.youtube:hover {
+        background-color: #FF0000; /* Đỏ Youtube */
+        border-color: #FF0000;
+        color: white;
+    }
+
+    .social-text-btn.tiktok:hover {
+        background-color: #000000; /* Đen Tiktok */
+        border-color: #ffffff;
+        color: white;
+    }
+
+    /* Các CSS phụ trợ khác */
+    .text-white-50 { color: rgba(255, 255, 255, 0.7) !important; }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    footer { margin-top: auto; }
+</style>

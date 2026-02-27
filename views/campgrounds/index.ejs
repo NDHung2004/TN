@@ -1,0 +1,108 @@
+<% layout("/layouts/boilerplate") %>
+
+<div id="cluster-map" style="width: 100%; height: 500px"></div>
+
+<h1 class="mb-3 mt-3">Tất cả quán ăn</h1>
+<div class="row mb-4">
+  <div class="col-md-6 offset-md-3">
+    <form action="/campgrounds" method="GET" class="input-group shadow-sm">
+      <input 
+        type="text" 
+        name="search" 
+        class="form-control" 
+        placeholder="Tìm tên quán, địa điểm, món ăn..." 
+        value="<%= search %>" 
+      >
+      <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+      <% if(search) { %>
+        <a href="/campgrounds" class="btn btn-outline-secondary">Xóa lọc</a>
+      <% } %>
+    </form>
+  </div>
+</div>
+<div class="mb-3">
+  <a class="btn btn-success" href="/campgrounds/new">Thêm quán ăn mới</a>
+</div>
+
+<% for (let campground of campgrounds) {%>
+<div class="card mb-3 campgroundBg">
+  <div class="row">
+    <div class="col-md-3">
+      <% if (campground.images.length) { %>
+      <img
+        src="<%=campground.images[0].url %>"
+        class="img-fluid campgroundThumbnailSize"
+        style="width: 100%; height: 200px; object-fit: cover;" 
+      />
+      <% } else { %>
+      <img
+        src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop"
+        alt="Vietnamese food"
+        class="img-fluid"
+        style="width: 100%; height: 200px; object-fit: cover;"
+      />
+      <% } %>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title text-white"><%=campground.title%></h5>
+        <span class="badge rounded-pill bg-info text-dark mb-2">
+            <i class="fas fa-tag small"></i> <%= campground.category || 'Ẩm thực' %>
+        </span>
+        <p class="card-text text-white"><%=campground.description%></p>
+        <p class="card-text">
+          <small class="text-secondary"><%=campground.location%></small>
+        </p>
+
+        <a href="/campgrounds/<%=campground._id %>" class="btn btn-primary">
+          Xem chi tiết <%=campground.title %>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<% if (totalPages > 1) { %>
+<nav aria-label="Page navigation" class="mt-4 mb-5">
+  <ul class="pagination justify-content-center">
+    
+    <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+      <a class="page-link" href="/campgrounds?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %>">Trước</a>
+    </li>
+
+    <% 
+       let startPage = Math.max(1, currentPage - 2);
+       let endPage = Math.min(totalPages, currentPage + 2);
+    %>
+
+    <% if (startPage > 1) { %>
+        <li class="page-item"><a class="page-link" href="/campgrounds?page=1<%= search ? '&search=' + search : '' %>">1</a></li>
+        <% if (startPage > 2) { %> <li class="page-item disabled"><span class="page-link">...</span></li> <% } %>
+    <% } %>
+
+    <% for(let i = startPage; i <= endPage; i++) { %>
+        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+            <a class="page-link" href="/campgrounds?page=<%= i %><%= search ? '&search=' + search : '' %>"><%= i %></a>
+        </li>
+    <% } %>
+
+    <% if (endPage < totalPages) { %>
+        <% if (endPage < totalPages - 1) { %> <li class="page-item disabled"><span class="page-link">...</span></li> <% } %>
+        <li class="page-item"><a class="page-link" href="/campgrounds?page=<%= totalPages %><%= search ? '&search=' + search : '' %>"><%= totalPages %></a></li>
+    <% } %>
+
+    <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+      <a class="page-link" href="/campgrounds?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %>">Sau</a>
+    </li>
+  </ul>
+</nav>
+<% } %>
+
+<script>
+  const mapToken = "<%-process.env.MAPBOX_TOKEN %>";
+ 
+  const campgrounds = {features: <%- JSON.stringify(allCampgroundsForMap) %>};
+</script>
+<script src="/javascript/clustermap.js"></script>

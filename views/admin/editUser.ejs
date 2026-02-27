@@ -1,0 +1,47 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 p-0">
+            <%- include('../partials/adminSidebar') %>
+        </div>
+
+        <div class="col-md-10 p-4">
+            <h2 class="mb-4">Chỉnh sửa Người dùng: <%= user.username %></h2>
+
+            <div class="card shadow" style="max-width: 600px;">
+                <div class="card-body">
+                    <form action="/admin/users/<%= user._id %>?_method=PUT" method="POST">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tên đăng nhập (Username)</label>
+                            <input type="text" class="form-control" name="username" value="<%= user.username %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="<%= user.email %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Vai trò (Role)</label>
+                            <select name="role" class="form-select">
+                                <option value="user" <%= user.role === 'user' ? 'selected' : '' %>>User</option>
+                                <option value="moderator" <%= user.role === 'moderator' ? 'selected' : '' %>>Moderator</option>
+                                <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="isBanned" name="isBanned" <%= user.isBanned ? 'checked' : '' %>>
+                            <label class="form-check-label text-danger fw-bold" for="isBanned">Khóa tài khoản này (Ban User)</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+                        <a href="/admin/users" class="btn btn-secondary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

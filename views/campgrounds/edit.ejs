@@ -1,0 +1,98 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row">
+  <h1 class="text-center mt-4">Chỉnh sửa quán ăn</h1>
+  <div class="col-md-6 offset-md-3">
+    <form
+      action="/campgrounds/<%=campground._id%>?_method=PUT"
+      method="POST"
+      class="validated-form"
+      enctype="multipart/form-data"
+      novalidate>
+      
+      <div class="mb-3">
+        <label class="form-label" for="title">Tên quán ăn</label>
+        <input
+          class="form-control"
+          type="text"
+          name="campground[title]"
+          id="title"
+          value="<%=campground.title%>"
+          required />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="location">Địa chỉ</label>
+        <input
+          class="form-control"
+          type="text"
+          name="campground[location]"
+          id="location"
+          value="<%=campground.location%>"
+          required />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="description">Mô tả quán</label>
+        <textarea
+          class="form-control"
+          type="text"
+          name="campground[description]"
+          id="description"
+          required>
+<%=campground.description%></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="price">Giá trung bình</label>
+        <div class="input-group">
+          <span class="input-group-text" id="price-label">₫</span>
+          <input
+            type="text"
+            id="description"
+            class="form-control"
+            name="campground[price]"
+            placeholder="0"
+            aria-label="Price"
+            aria-describedby="price-label"
+            value="<%=campground.price%>"
+            required />
+        </div>
+      </div>
+
+      <div class="mb-3 custom-file">
+        <label for="images" class="form-label custom-file-label">
+          Thêm hình ảnh mới
+        </label>
+        <input
+          class="form-control"
+          name="image"
+          type="file"
+          id="images"
+          multiple />
+      </div>
+
+      <div class="mb-3">
+        <% campground.images.forEach(function(img, i) { %>
+        <img src="<%= img.thumbnail %>" class="img-thumbnail" alt="" />
+        <div class="form-check-inline">
+          <label for="image-<%= i  %>">Xóa ảnh này?</label>
+          <input
+            type="checkbox"
+            name="deleteImages[]"
+            value="<%= img.filename  %>"
+            id="image-<%= i  %>" />
+        </div>
+        <% }) %>
+      </div>
+
+      <div class="mb-3">
+        <button class="btn btn-success">Cập nhật quán ăn</button>
+      </div>
+
+      <footer>
+        <a href="/campgrounds/<%=campground._id%>">Quay lại</a>
+      </footer>
+    </form>
+  </div>
+</div>

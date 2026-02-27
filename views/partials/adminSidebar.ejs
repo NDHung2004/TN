@@ -1,0 +1,50 @@
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-white shadow h-100" style="min-height: 100vh;">
+    <a href="/admin" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+        <span class="fs-4 fw-bold text-primary">Admin Panel</span>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+    
+    <% if(currentUser.role === 'admin') { %>
+    <li class="nav-item">
+        <a href="/admin" class="nav-link <%= active === 'dashboard' ? 'active' : 'link-dark' %>">
+            <i class="fas fa-tachometer-alt me-2"></i> Tổng quan
+        </a>
+    </li>
+    
+    <li>
+        <a href="/admin/users" class="nav-link <%= active === 'users' ? 'active' : 'link-dark' %>">
+            <i class="fas fa-users me-2"></i> Người dùng
+        </a>
+    </li>
+    <li>
+    <a href="/admin/categories" class="nav-link <%= active === 'categories' ? 'active' : 'link-dark' %>">
+        <i class="fas fa-tags me-2"></i> Quản lý Danh mục
+    </a>
+    </li>
+    <li>
+    <a href="/admin/settings" class="nav-link <%= active === 'generalSetting' ? 'active' : 'link-dark' %>">
+        <i class="fas fa-tags me-2"></i> Cấu hình
+    </a>
+    </li>
+    <% } %>
+
+    <li>
+        <a href="/admin/campgrounds" class="nav-link <%= active === 'campgrounds' ? 'active' : 'link-dark' %>">
+            <i class="fas fa-store me-2"></i> Bài đăng
+        </a>
+    </li>
+    <li>
+    <a href="/admin/reviews?filter=reported" class="nav-link <%= active === 'reviews' ? 'active' : 'link-dark' %>">
+        <i class="fas fa-comments me-2"></i> Quản lý Bình luận
+    </a>
+</li>
+
+</ul>
+    <hr>
+    <div class="dropdown">
+        <a href="/" class="d-flex align-items-center link-dark text-decoration-none">
+            <i class="fas fa-home me-2"></i> <strong>Về trang chủ</strong>
+        </a>
+    </div>
+</div>
