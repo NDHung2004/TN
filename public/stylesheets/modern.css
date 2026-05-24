@@ -1,0 +1,52 @@
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #1f2937; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1; 
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #4b5563; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8; 
+}
+
+/* Base Body tweaks */
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphism helpers */
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.dark .glass {
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Mapbox overrides to fit border radius */
+.mapboxgl-map {
+    border-radius: 1rem;
+}

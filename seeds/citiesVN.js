@@ -1,0 +1,22 @@
+module.exports = [
+    { city: "Hà Nội", state: "Hà Nội", latitude: 21.028511, longitude: 105.804817 },
+    { city: "TP. Hồ Chí Minh", state: "Hồ Chí Minh", latitude: 10.823099, longitude: 106.629662 },
+    { city: "Đà Nẵng", state: "Đà Nẵng", latitude: 16.054407, longitude: 108.202164 },
+    { city: "Hải Phòng", state: "Hải Phòng", latitude: 20.844912, longitude: 106.688084 },
+    { city: "Cần Thơ", state: "Cần Thơ", latitude: 10.045162, longitude: 105.746857 },
+    { city: "Nha Trang", state: "Khánh Hòa", latitude: 12.238791, longitude: 109.196749 },
+    { city: "Đà Lạt", state: "Lâm Đồng", latitude: 11.940419, longitude: 108.458313 },
+    { city: "Huế", state: "Thừa Thiên Huế", latitude: 16.463714, longitude: 107.590866 },
+    { city: "Hạ Long", state: "Quảng Ninh", latitude: 20.950485, longitude: 107.073425 },
+    { city: "Vũng Tàu", state: "Bà Rịa - Vũng Tàu", latitude: 10.34599, longitude: 107.08426 },
+    { city: "Quy Nhơn", state: "Bình Định", latitude: 13.782967, longitude: 109.219663 },
+    { city: "Phan Thiết", state: "Bình Thuận", latitude: 10.92556, longitude: 108.10304 },
+    { city: "Buôn Ma Thuột", state: "Đắk Lắk", latitude: 12.666138, longitude: 108.038239 },
+    { city: "Biên Hòa", state: "Đồng Nai", latitude: 10.95758, longitude: 106.84271 },
+    { city: "Thanh Hóa", state: "Thanh Hóa", latitude: 19.80753, longitude: 105.77665 },
+    { city: "Vinh", state: "Nghệ An", latitude: 18.67337, longitude: 105.68133 },
+    { city: "Thái Nguyên", state: "Thái Nguyên", latitude: 21.59422, longitude: 105.84817 },
+    { city: "Nam Định", state: "Nam Định", latitude: 20.43003, longitude: 106.17702 },
+    { city: "Bắc Ninh", state: "Bắc Ninh", latitude: 21.18608, longitude: 106.07631 },
+    { city: "Hội An", state: "Quảng Nam", latitude: 15.880058, longitude: 108.338047 }
+];

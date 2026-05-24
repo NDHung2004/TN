@@ -73,6 +73,39 @@ module.exports.deleteCampgroundAdmin = async (req, res) => {
     req.flash('success', 'Đã xóa quán ăn thành công');
     res.redirect('/admin/campgrounds');
 };
+
+// 5. Bulk actions (Duyệt nhiều, từ chối nhiều, xóa nhiều)
+module.exports.bulkCampgroundsAction = async (req, res) => {
+    let { campgroundIds, action } = req.body;
+    
+    // Nếu chỉ chọn 1 checkbox, campgroundIds là string. Nếu chọn nhiều, nó là array.
+    if (!campgroundIds) {
+        req.flash('error', 'Vui lòng chọn ít nhất 1 quán ăn để thực hiện!');
+        return res.redirect(req.get('Referrer') || '/admin/campgrounds');
+    }
+    
+    if (!Array.isArray(campgroundIds)) {
+        campgroundIds = [campgroundIds];
+    }
+    
+    if (action === 'approve') {
+        await Campground.updateMany({ _id: { $in: campgroundIds } }, { status: 'approved' });
+        req.flash('success', `Đã duyệt ${campgroundIds.length} quán ăn!`);
+    } else if (action === 'reject') {
+        await Campground.updateMany({ _id: { $in: campgroundIds } }, { status: 'rejected' });
+        req.flash('success', `Đã từ chối ${campgroundIds.length} quán ăn!`);
+    } else if (action === 'delete') {
+        // Find and delete to trigger mongoose middleware if needed, but for bulk updateMany is faster.
+        // Actually, Campground uses findOneAndDelete middleware to delete reviews/images. 
+        // We should loop through them to trigger middlewares.
+        for (let id of campgroundIds) {
+            await Campground.findByIdAndDelete(id);
+        }
+        req.flash('success', `Đã xóa ${campgroundIds.length} quán ăn!`);
+    }
+    
+    res.redirect(req.get('Referrer') || '/admin/campgrounds');
+};
 module.exports.index = async (req, res) => {
     // 1. Lấy tổng số lượng (Stats Cards)
     const userCount = await User.countDocuments({});
@@ -109,6 +142,18 @@ module.exports.index = async (req, res) => {
         else negative++;
     });
 
+    // 4. Phân bổ danh mục
+    const categoryDistribution = await Campground.aggregate([
+        {
+            $group: {
+                _id: "$category",
+                count: { $sum: 1 }
+            }
+        }
+    ]);
+    const catLabels = categoryDistribution.map(c => c._id || 'Khác');
+    const catData = categoryDistribution.map(c => c.count);
+
     // Render ra view và truyền dữ liệu
     res.render('admin/index', {
         userCount,
@@ -116,6 +161,8 @@ module.exports.index = async (req, res) => {
         reviewCount,
         monthlyUsers, // Dữ liệu biểu đồ cột
         sentimentData: [positive, neutral, negative],
+        catLabels: JSON.stringify(catLabels),
+        catData: JSON.stringify(catData),
         active: 'dashboard'
     });
 };
@@ -236,29 +283,32 @@ module.exports.updateUser = async (req, res) => {
 // 1. Hiển thị danh sách Review
 module.exports.renderReviews = async (req, res) => {
     const { filter } = req.query; // filter=reported
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
     let query = {};
     
     if (filter === 'reported') {
         query.isReported = true;
     }
 
+    const totalReviews = await Review.countDocuments(query);
+    const totalPages = Math.ceil(totalReviews / limit);
+
     // Lấy review và populate cả User lẫn Campground (để biết review ở bài nào)
     const reviews = await Review.find(query)
         .populate('author')
-        .sort({ isReported: -1, _id: -1 }); // Ưu tiên review bị báo cáo lên đầu
+        .sort({ isReported: -1, _id: -1 }) // Ưu tiên review bị báo cáo lên đầu
+        .skip(skip)
+        .limit(limit);
 
-    // Để lấy thông tin campground cha, ta cần truy vấn ngược (Hơi phức tạp chút)
-    // Cách đơn giản: Duyệt qua từng review để tìm campground chứa nó (hoặc lưu campgroundId trong Review từ đầu)
-    // Ở đây ta tạm thời dùng thủ thuật find campground chứa review ID này ở view (hoặc tối ưu sau)
-    
-    // Tốt nhất: Cập nhật Model Review thêm field 'campground' nếu muốn nhanh. 
-    // Nhưng để giữ code bạn hiện tại, ta sẽ query campground thủ công ở bước View hoặc dùng aggregation.
-    // ĐỂ ĐƠN GIẢN: Ta sẽ hiển thị nội dung thôi.
-    
     res.render('admin/reviews', { 
         reviews, 
         active: 'reviews', 
-        filter 
+        filter,
+        currentPage: page,
+        totalPages
     });
 };
 

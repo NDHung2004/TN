@@ -1,89 +1,109 @@
 <% layout('layouts/boilerplate') %>
 
-<div class="container-fluid">
-    <div class="row">
-        
-        <div class="col-md-2 p-0">
-            <%- include('../partials/adminSidebar') %>
+<div class="flex min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <!-- Sidebar (fixed) -->
+    <div class="hidden md:block sticky top-0 h-screen">
+        <%- include('../partials/adminSidebar') %>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6 md:p-10 max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-aos="fade-right">Dashboard Tổng Quan</h1>
         </div>
 
-        <div class="col-md-10 p-4">
-            <h1 class="mb-4">Dashboard Tổng quan</h1>
-
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="card text-white bg-primary mb-3 shadow h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="card-title">Người dùng</h5>
-                                    <h2 class="display-4 fw-bold"><%= userCount %></h2>
-                                </div>
-                                <i class="fas fa-users fa-4x opacity-50"></i>
-                            </div>
-                        </div>
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- Card 1: Users -->
+            <div class="bg-blue-500 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden" data-aos="fade-up" data-aos-delay="0">
+                <div class="relative z-10 flex justify-between items-center">
+                    <div>
+                        <h5 class="text-blue-100 text-sm font-bold uppercase tracking-wider mb-1">Người dùng</h5>
+                        <h2 class="text-5xl font-extrabold"><%= userCount %></h2>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-users text-3xl"></i>
                     </div>
                 </div>
+                <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+            </div>
 
-                <div class="col-md-4">
-                    <div class="card text-white bg-success mb-3 shadow h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="card-title">Quán ăn</h5>
-                                    <h2 class="display-4 fw-bold"><%= campCount %></h2>
-                                </div>
-                                <i class="fas fa-store fa-4x opacity-50"></i>
-                            </div>
-                        </div>
+            <!-- Card 2: Campgrounds -->
+            <div class="bg-emerald-500 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                <div class="relative z-10 flex justify-between items-center">
+                    <div>
+                        <h5 class="text-emerald-100 text-sm font-bold uppercase tracking-wider mb-1">Quán ăn</h5>
+                        <h2 class="text-5xl font-extrabold"><%= campCount %></h2>
+                    </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-store text-3xl"></i>
                     </div>
                 </div>
+                <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+            </div>
 
-                <div class="col-md-4">
-                    <div class="card text-white bg-warning mb-3 shadow h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="card-title">Đánh giá</h5>
-                                    <h2 class="display-4 fw-bold"><%= reviewCount %></h2>
-                                </div>
-                                <i class="fas fa-comments fa-4x opacity-50"></i>
-                            </div>
-                        </div>
+            <!-- Card 3: Reviews -->
+            <div class="bg-amber-500 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+                <div class="relative z-10 flex justify-between items-center">
+                    <div>
+                        <h5 class="text-amber-100 text-sm font-bold uppercase tracking-wider mb-1">Đánh giá</h5>
+                        <h2 class="text-5xl font-extrabold"><%= reviewCount %></h2>
                     </div>
+                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                        <i class="fas fa-comments text-3xl"></i>
+                    </div>
+                </div>
+                <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Line Chart -->
+            <div class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col" data-aos="fade-up" data-aos-delay="300">
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <h6 class="font-bold text-gray-800 dark:text-gray-200"><i class="fas fa-chart-line mr-2 text-primary-500"></i> Tăng trưởng Người dùng</h6>
+                </div>
+                <div class="p-6 flex-1 min-h-[300px]">
+                    <canvas id="userGrowthChart"></canvas>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-8 mb-4">
-                    <div class="card shadow">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Tăng trưởng Người dùng (Năm nay)</h6>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="userGrowthChart"></canvas>
-                        </div>
-                    </div>
+            <!-- Category Chart -->
+            <div class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col" data-aos="fade-up" data-aos-delay="350">
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <h6 class="font-bold text-gray-800 dark:text-gray-200"><i class="fas fa-chart-bar mr-2 text-primary-500"></i> Phân bổ Danh mục</h6>
                 </div>
+                <div class="p-6 flex-1 min-h-[300px]">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
 
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Tỷ lệ Cảm xúc Đánh giá</h6>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="sentimentChart"></canvas>
-                        </div>
-                    </div>
+        <div class="grid grid-cols-1 gap-8">
+
+            <!-- Doughnut Chart -->
+            <div class="lg:col-span-3 bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col" data-aos="fade-up" data-aos-delay="400">
+                <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <h6 class="font-bold text-gray-800 dark:text-gray-200"><i class="fas fa-chart-pie mr-2 text-primary-500"></i> Tỷ lệ Cảm xúc Đánh giá</h6>
+                </div>
+                <div class="p-6 flex-1 min-h-[300px]">
+                    <canvas id="sentimentChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    // System color variables (for Tailwind compatibility)
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#9ca3af' : '#4b5563';
+    const gridColor = isDarkMode ? '#374151' : '#f3f4f6';
+
     // --- BIỂU ĐỒ 1: TĂNG TRƯỞNG USER ---
     const ctxUser = document.getElementById('userGrowthChart').getContext('2d');
     const userGrowthChart = new Chart(ctxUser, {
@@ -93,16 +113,33 @@
             datasets: [{
                 label: 'Thành viên mới',
                 data: [<%= monthlyUsers %>], 
-                borderColor: '#4e73df',
-                backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                tension: 0.3,
+                borderColor: '#3b82f6', // blue-500
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 3,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                tension: 0.4,
                 fill: true
             }]
         },
         options: {
+            responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
             scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } }
+                x: {
+                    grid: { display: false, color: gridColor },
+                    ticks: { color: textColor, font: { family: 'Inter', size: 12 } }
+                },
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: gridColor, borderDash: [5, 5] },
+                    ticks: { color: textColor, precision: 0, font: { family: 'Inter', size: 12 } } 
+                }
             }
         }
     });
@@ -115,12 +152,63 @@
             labels: ['Tích cực (4-5sao)', 'Trung tính (3sao)', 'Tiêu cực (1-2sao)'],
             datasets: [{
                 data: [<%= sentimentData %>],
-                backgroundColor: ['#1cc88a', '#f6c23e', '#e74a3b'],
-                hoverOffset: 4
+                backgroundColor: [
+                    '#10b981', // emerald-500
+                    '#f59e0b', // amber-500
+                    '#ef4444'  // red-500
+                ],
+                borderWidth: 0,
+                hoverOffset: 6
             }]
         },
         options: {
+            responsive: true,
             maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: { 
+                    position: 'bottom',
+                    labels: { 
+                        color: textColor, 
+                        usePointStyle: true, 
+                        padding: 20,
+                        font: { family: 'Inter', size: 12 }
+                    }
+                }
+            }
+        }
+    });
+
+    // --- BIỂU ĐỒ 3: CATEGORY DISTRIBUTION ---
+    const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+    const categoryChart = new Chart(ctxCategory, {
+        type: 'bar',
+        data: {
+            labels: <%- catLabels %>,
+            datasets: [{
+                label: 'Số lượng Quán',
+                data: <%- catData %>,
+                backgroundColor: '#8b5cf6', // violet-500
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { display: false, color: gridColor },
+                    ticks: { color: textColor, font: { family: 'Inter', size: 12 } }
+                },
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: gridColor, borderDash: [5, 5] },
+                    ticks: { color: textColor, precision: 0, font: { family: 'Inter', size: 12 } } 
+                }
+            }
         }
     });
 </script>

@@ -1,34 +1,59 @@
 <% layout('layouts/boilerplate') %>
 
-<div class="container mt-5">
-    <h1 class="text-center mb-4 text-danger">Danh sách quán yêu thích <i class="fas fa-heart"></i></h1>
-    
-    <% if(favorites.length === 0) { %>
-        <div class="alert alert-warning text-center">
-            Bạn chưa yêu thích quán nào cả. <a href="/campgrounds" class="alert-link">Khám phá ngay!</a>
+<div class="mb-10 text-center" data-aos="fade-down">
+    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-4 flex justify-center items-center gap-3">
+        Danh sách yêu thích <i class="fas fa-heart text-rose-500"></i>
+    </h1>
+    <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">Những quán ăn tuyệt vời mà bạn đã lưu lại để thưởng thức sau.</p>
+</div>
+
+<% if(favorites.length === 0) { %>
+    <div class="text-center py-20 bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm" data-aos="fade-up">
+        <div class="w-20 h-20 mx-auto bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-heart-broken text-3xl text-rose-300 dark:text-rose-700"></i>
         </div>
-    <% } else { %>
-        <div class="row">
-            <% for(let camp of favorites) { %>
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow">
-                        <% if(camp.images.length) { %>
-                            <img src="<%= camp.images[0].url %>" class="card-img-top" style="height: 200px; object-fit: cover;">
-                        <% } else { %>
-                            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=500&q=60" class="card-img-top" style="height: 200px; object-fit: cover;">
-                        <% } %>
-                        <div class="card-body">
-                            <h5 class="card-title"><%= camp.title %></h5>
-                            <p class="card-text text-muted"><%= camp.location %></p>
-                            <a href="/campgrounds/<%= camp._id %>" class="btn btn-primary btn-sm">Xem chi tiết</a>
-                            
-                            <form action="/campgrounds/<%= camp._id %>/favorite" method="POST" class="d-inline float-end">
-                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i> Bỏ thích</button>
-                            </form>
-                        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Bạn chưa yêu thích quán nào</h3>
+        <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Hãy khám phá thêm những địa điểm ẩm thực hấp dẫn và thêm vào danh sách yêu thích nhé.</p>
+        <a href="/campgrounds" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 shadow-md transition-all duration-300">
+            <i class="fas fa-search mr-2"></i> Khám phá ngay
+        </a>
+    </div>
+<% } else { %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+        <% for (let i = 0; i < favorites.length; i++) { %>
+            <% let camp = favorites[i]; %>
+            <div class="bg-white dark:bg-dark-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 flex flex-col h-full group" data-aos="fade-up" data-aos-delay="<%= (i % 4) * 50 %>">
+                
+                <div class="relative h-48 overflow-hidden">
+                    <% if (camp.images.length) { %>
+                        <img src="<%=camp.images[0].url %>" alt="<%= camp.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <% } else { %>
+                        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="Vietnamese food" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <% } %>
+                    <!-- Heart Badge overlay -->
+                    <form action="/campgrounds/<%= camp._id %>/favorite" method="POST" class="absolute top-3 right-3">
+                        <button type="submit" class="w-10 h-10 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm text-rose-500 shadow-sm flex items-center justify-center hover:scale-110 transition-transform">
+                            <i class="fas fa-heart text-lg"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="p-5 flex flex-col flex-grow">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white line-clamp-1 mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                        <%= camp.title %>
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 flex items-start gap-1.5 mb-4 line-clamp-1">
+                        <i class="fas fa-map-marker-alt mt-1 text-gray-400 shrink-0"></i>
+                        <span><%= camp.location %></span>
+                    </p>
+                    
+                    <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <a href="/campgrounds/<%= camp._id %>" class="block w-full py-2.5 px-4 text-center text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
+                            Xem chi tiết
+                        </a>
                     </div>
                 </div>
-            <% } %>
-        </div>
-    <% } %>
-</div>
+            </div>
+        <% } %>
+    </div>
+<% } %>

@@ -1,19 +1,55 @@
 <% if(typeof success !== "undefined" && success.length) {%>
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  <strong><%= success %></strong>
-  <button
-    type="button"
-    class="btn-close"
-    data-bs-dismiss="alert"
-    aria-label="Close"></button>
+<div class="fixed top-24 right-4 z-50 animate-bounce-in">
+    <div class="flex items-center p-4 mb-4 w-full max-w-xs text-gray-500 bg-white rounded-xl shadow-xl dark:text-gray-400 dark:bg-dark-card border-l-4 border-green-500" role="alert">
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800/30 dark:text-green-200">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="ml-3 text-sm font-medium mr-4">
+            <%= success %>
+        </div>
+        <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-dark-card dark:hover:bg-gray-800" onclick="this.parentElement.parentElement.remove()" aria-label="Close">
+            <span class="sr-only">Close</span>
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
 </div>
-<%} %> <% if (typeof error !== "undefined" && error.length) {%>
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-  <strong><%= error %></strong>
-  <button
-    type="button"
-    class="btn-close"
-    data-bs-dismiss="alert"
-    aria-label="Close"></button>
+<%} %> 
+
+<% if (typeof error !== "undefined" && error.length) {%>
+<div class="fixed top-24 right-4 z-50 animate-bounce-in">
+    <div class="flex items-center p-4 mb-4 w-full max-w-xs text-gray-500 bg-white rounded-xl shadow-xl dark:text-gray-400 dark:bg-dark-card border-l-4 border-red-500" role="alert">
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800/30 dark:text-red-200">
+            <i class="fas fa-exclamation"></i>
+        </div>
+        <div class="ml-3 text-sm font-medium mr-4">
+            <%= error %>
+        </div>
+        <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-dark-card dark:hover:bg-gray-800" onclick="this.parentElement.parentElement.remove()" aria-label="Close">
+            <span class="sr-only">Close</span>
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
 </div>
 <%} %>
+
+<style>
+    @keyframes bounceIn {
+        0% { transform: translateY(-20px); opacity: 0; }
+        50% { transform: translateY(5px); opacity: 1; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+    .animate-bounce-in {
+        animation: bounceIn 0.5s ease-out forwards;
+    }
+</style>
+<script>
+    // Tự động ẩn flash message sau 5 giây
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.animate-bounce-in');
+        alerts.forEach(alert => {
+            alert.style.opacity = '0';
+            alert.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
+</script>

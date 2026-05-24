@@ -52,6 +52,10 @@ const CampgroundSchema = new Schema(
     isFeatured: {
         type: Boolean,
         default: false
+    },
+    views: {
+        type: Number,
+        default: 0
     }
   },
   {
@@ -59,6 +63,8 @@ const CampgroundSchema = new Schema(
     ...opts,
   }
 );
+
+CampgroundSchema.index({ geometry: "2dsphere" });
 
 CampgroundSchema.virtual("properties.popUpMarkup").get(function () {
   return `<strong><a href="/campgrounds/${this._id}">${this.title}</a></strong>

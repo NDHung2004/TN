@@ -1,98 +1,175 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row">
-  <h1 class="text-center mt-4">Chỉnh sửa quán ăn</h1>
-  <div class="col-md-6 offset-md-3">
-    <form
-      action="/campgrounds/<%=campground._id%>?_method=PUT"
-      method="POST"
-      class="validated-form"
-      enctype="multipart/form-data"
-      novalidate>
-      
-      <div class="mb-3">
-        <label class="form-label" for="title">Tên quán ăn</label>
-        <input
-          class="form-control"
-          type="text"
-          name="campground[title]"
-          id="title"
-          value="<%=campground.title%>"
-          required />
-      </div>
+<div class="max-w-2xl mx-auto py-8" data-aos="fade-up">
+    <!-- Back Button -->
+    <a href="/campgrounds/<%=campground._id%>" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors mb-6">
+        <i class="fas fa-arrow-left mr-2"></i> Quay lại chi tiết
+    </a>
 
-      <div class="mb-3">
-        <label class="form-label" for="location">Địa chỉ</label>
-        <input
-          class="form-control"
-          type="text"
-          name="campground[location]"
-          id="location"
-          value="<%=campground.location%>"
-          required />
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label" for="description">Mô tả quán</label>
-        <textarea
-          class="form-control"
-          type="text"
-          name="campground[description]"
-          id="description"
-          required>
-<%=campground.description%></textarea>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label" for="price">Giá trung bình</label>
-        <div class="input-group">
-          <span class="input-group-text" id="price-label">₫</span>
-          <input
-            type="text"
-            id="description"
-            class="form-control"
-            name="campground[price]"
-            placeholder="0"
-            aria-label="Price"
-            aria-describedby="price-label"
-            value="<%=campground.price%>"
-            required />
+    <div class="bg-white dark:bg-dark-card rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-primary-600 to-primary-800 px-8 py-6 text-white text-center">
+            <h1 class="text-2xl font-extrabold tracking-tight">Cập Nhật Thông Tin</h1>
+            <p class="text-primary-100 text-sm mt-1"><%= campground.title %></p>
         </div>
-      </div>
 
-      <div class="mb-3 custom-file">
-        <label for="images" class="form-label custom-file-label">
-          Thêm hình ảnh mới
-        </label>
-        <input
-          class="form-control"
-          name="image"
-          type="file"
-          id="images"
-          multiple />
-      </div>
+        <!-- Form -->
+        <div class="p-8">
+            <form action="/campgrounds/<%=campground._id%>?_method=PUT" method="POST" class="validated-form space-y-6" novalidate enctype="multipart/form-data">
 
-      <div class="mb-3">
-        <% campground.images.forEach(function(img, i) { %>
-        <img src="<%= img.thumbnail %>" class="img-thumbnail" alt="" />
-        <div class="form-check-inline">
-          <label for="image-<%= i  %>">Xóa ảnh này?</label>
-          <input
-            type="checkbox"
-            name="deleteImages[]"
-            value="<%= img.filename  %>"
-            id="image-<%= i  %>" />
+                <!-- Tên Quán -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" for="title">Tên quán ăn</label>
+                    <input 
+                        type="text" 
+                        name="campground[title]" 
+                        id="title" 
+                        value="<%=campground.title%>"
+                        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors" 
+                        required 
+                    />
+                    <div class="invalid-feedback text-sm text-red-500 mt-1">Vui lòng nhập tên quán ăn.</div>
+                </div>
+
+                <!-- Địa chỉ -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" for="location">Địa chỉ</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-map-marker-alt text-gray-400"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            name="campground[location]" 
+                            id="location" 
+                            value="<%=campground.location%>"
+                            class="block w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors" 
+                            required 
+                        />
+                    </div>
+                    <div class="invalid-feedback text-sm text-red-500 mt-1">Vui lòng nhập địa chỉ hợp lệ.</div>
+                </div>
+
+                <!-- Danh mục & Giá -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" for="category">Danh mục</label>
+                        <select 
+                            id="category" 
+                            name="campground[category]" 
+                            class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors appearance-none" 
+                            required
+                        >
+                            <% if(typeof categories !== 'undefined' && categories.length > 0) { %>
+                                <% for(let cat of categories) { %>
+                                    <option value="<%= cat.name %>" <%= campground.category === cat.name ? 'selected' : '' %>><%= cat.name %></option>
+                                <% } %>
+                            <% } else { %>
+                                <option value="Khác" selected>Khác</option>
+                            <% } %>
+                        </select>
+                        <div class="invalid-feedback text-sm text-red-500 mt-1">Vui lòng chọn danh mục.</div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" for="price">Giá trung bình</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <span class="text-gray-500 dark:text-gray-400 font-bold">₫</span>
+                            </div>
+                            <input 
+                                type="number" 
+                                id="price" 
+                                name="campground[price]" 
+                                value="<%=campground.price%>"
+                                class="block w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors" 
+                                min="0" 
+                                required 
+                            />
+                        </div>
+                        <div class="invalid-feedback text-sm text-red-500 mt-1">Vui lòng nhập giá hợp lệ.</div>
+                    </div>
+                </div>
+
+                <!-- Thêm Hình ảnh -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" for="images">Thêm hình ảnh mới</label>
+                    <div class="flex items-center justify-center w-full">
+                        <label for="images" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700 transition-colors">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
+                                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Bấm để tải thêm ảnh</span></p>
+                            </div>
+                            <input id="images" name="image" type="file" class="hidden" multiple />
+                        </label>
+                    </div>
+                    <div id="file-chosen" class="text-sm text-primary-600 dark:text-primary-400 mt-2 font-medium hidden"></div>
+                </div>
+
+                <!-- Quản lý ảnh hiện tại -->
+                <% if(campground.images.length > 0) { %>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Quản lý ảnh hiện tại (Chọn để xóa)</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            <% campground.images.forEach(function(img, i) { %>
+                                <div class="relative group cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        name="deleteImages[]" 
+                                        value="<%= img.filename %>" 
+                                        id="image-<%= i %>" 
+                                        class="peer hidden"
+                                    />
+                                    <label for="image-<%= i %>" class="block w-full h-24 rounded-lg overflow-hidden border-2 border-transparent peer-checked:border-red-500 peer-checked:opacity-50 transition-all duration-200 relative cursor-pointer shadow-sm hover:shadow-md">
+                                        <img src="<%= img.thumbnail %>" class="w-full h-full object-cover" alt="" />
+                                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 peer-checked:bg-red-500/30 flex items-center justify-center transition-colors">
+                                            <i class="fas fa-trash-alt text-white opacity-0 group-hover:opacity-100 peer-checked:opacity-100 text-xl drop-shadow-md"></i>
+                                        </div>
+                                    </label>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- Mô tả -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" for="description">Mô tả quán ăn</label>
+                    <textarea 
+                        name="campground[description]" 
+                        id="description" 
+                        rows="5" 
+                        class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none" 
+                        required
+                    ><%=campground.description%></textarea>
+                    <div class="invalid-feedback text-sm text-red-500 mt-1">Vui lòng nhập mô tả hợp lệ.</div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300">
+                        <i class="fas fa-save mr-2"></i> Lưu Thay Đổi
+                    </button>
+                </div>
+            </form>
         </div>
-        <% }) %>
-      </div>
-
-      <div class="mb-3">
-        <button class="btn btn-success">Cập nhật quán ăn</button>
-      </div>
-
-      <footer>
-        <a href="/campgrounds/<%=campground._id%>">Quay lại</a>
-      </footer>
-    </form>
-  </div>
+    </div>
 </div>
+
+<script>
+    const fileInput = document.getElementById('images');
+    const fileChosen = document.getElementById('file-chosen');
+
+    fileInput.addEventListener('change', function(){
+        if(this.files.length > 0) {
+            fileChosen.classList.remove('hidden');
+            if(this.files.length === 1) {
+                fileChosen.textContent = 'Đã chọn 1 tệp tải lên thêm: ' + this.files[0].name;
+            } else {
+                fileChosen.textContent = 'Đã chọn ' + this.files.length + ' tệp tải lên thêm';
+            }
+        } else {
+            fileChosen.classList.add('hidden');
+        }
+    })
+</script>

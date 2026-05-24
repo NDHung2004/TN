@@ -26,14 +26,14 @@ router.put('/users/:id', isLoggedIn, isAdmin, adminController.updateUser);
 // 1. Xem danh sách
 router.get('/campgrounds', isLoggedIn, isModOrAdmin, adminController.renderCampgrounds);
 
-// 2. Cập nhật trạng thái (Duyệt/Từ chối)
+// 2. Chuyển trạng thái (Duyệt/Từ chối)
 router.patch('/campgrounds/:id/status', isLoggedIn, isModOrAdmin, adminController.updateCampgroundStatus);
-
-// 3. Ghim bài nổi bật
-router.patch('/campgrounds/:id/featured', isLoggedIn, isModOrAdmin, adminController.toggleFeatured);
-
-// 4. Xóa bài (Route riêng cho admin để redirect đúng chỗ)
+// 3. Ghim bài
+router.patch('/campgrounds/:id/featured', isLoggedIn, isAdmin, adminController.toggleFeatured);
+// 4. Xóa bài
 router.delete('/campgrounds/:id', isLoggedIn, isModOrAdmin, adminController.deleteCampgroundAdmin);
+// 5. Bulk actions (Duyệt nhiều, từ chối nhiều, xóa nhiều)
+router.patch('/campgrounds/bulk', isLoggedIn, isModOrAdmin, adminController.bulkCampgroundsAction);
 
 
 // --- QUẢN LÝ ĐÁNH GIÁ ---
@@ -46,19 +46,9 @@ router.delete('/reviews/:reviewId', isLoggedIn, isModOrAdmin, adminController.de
 // 3. Gỡ báo cáo (Tha cho review)
 router.patch('/reviews/:reviewId/dismiss', isLoggedIn, isModOrAdmin, adminController.dismissReport);
 // --- CẤU HÌNH HỆ THỐNG ---
-// 1. Trang cài đặt
-router.get('/settings', isLoggedIn, isAdmin, adminController.renderSettings);
-
-router.put('/settings/general', 
-    isLoggedIn, 
-    isAdmin,
-    // Cho phép upload 1 file Logo và 1 file Banner
-    upload.fields([
-        { name: 'logoFile', maxCount: 1 }, 
-        { name: 'bannerFile', maxCount: 1 }
-    ]), 
-    adminController.updateGeneralSettings
-);
+// (Đã loại bỏ chức năng cấu hình hệ thống theo yêu cầu)
+// router.get('/settings', isLoggedIn, isAdmin, adminController.renderSettings);
+// router.put('/settings/general', ...);
 
 // --- QUẢN LÝ DANH MỤC (CATEGORIES) ---
 // 1. Xem danh sách

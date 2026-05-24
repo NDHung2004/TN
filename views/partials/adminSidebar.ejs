@@ -1,50 +1,69 @@
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-white shadow h-100" style="min-height: 100vh;">
-    <a href="/admin" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-        <span class="fs-4 fw-bold text-primary">Admin Panel</span>
-    </a>
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
+<!-- adminSidebar.ejs -->
+<div class="flex flex-col w-64 bg-white dark:bg-dark-card border-r border-gray-100 dark:border-gray-800 h-full min-h-screen sticky top-0" data-aos="fade-right">
     
-    <% if(currentUser.role === 'admin') { %>
-    <li class="nav-item">
-        <a href="/admin" class="nav-link <%= active === 'dashboard' ? 'active' : 'link-dark' %>">
-            <i class="fas fa-tachometer-alt me-2"></i> Tổng quan
+    <!-- Header -->
+    <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-800 shrink-0 bg-white dark:bg-dark-card sticky top-0 z-10">
+        <a href="/admin" class="flex items-center gap-2 text-primary-600 dark:text-primary-400 font-extrabold text-xl tracking-tight transition-colors">
+            <i class="fas fa-shield-alt text-2xl"></i>
+            <span>Admin<span class="text-gray-900 dark:text-white">Panel</span></span>
         </a>
-    </li>
-    
-    <li>
-        <a href="/admin/users" class="nav-link <%= active === 'users' ? 'active' : 'link-dark' %>">
-            <i class="fas fa-users me-2"></i> Người dùng
-        </a>
-    </li>
-    <li>
-    <a href="/admin/categories" class="nav-link <%= active === 'categories' ? 'active' : 'link-dark' %>">
-        <i class="fas fa-tags me-2"></i> Quản lý Danh mục
-    </a>
-    </li>
-    <li>
-    <a href="/admin/settings" class="nav-link <%= active === 'generalSetting' ? 'active' : 'link-dark' %>">
-        <i class="fas fa-tags me-2"></i> Cấu hình
-    </a>
-    </li>
-    <% } %>
+    </div>
 
-    <li>
-        <a href="/admin/campgrounds" class="nav-link <%= active === 'campgrounds' ? 'active' : 'link-dark' %>">
-            <i class="fas fa-store me-2"></i> Bài đăng
-        </a>
-    </li>
-    <li>
-    <a href="/admin/reviews?filter=reported" class="nav-link <%= active === 'reviews' ? 'active' : 'link-dark' %>">
-        <i class="fas fa-comments me-2"></i> Quản lý Bình luận
-    </a>
-</li>
+    <!-- Navigation -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar py-4 px-3 flex flex-col gap-1.5 bg-gray-50/30 dark:bg-dark-bg/30">
+        
+        <% if(currentUser.role === 'admin') { %>
+            <div class="px-3 py-2 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1 mt-2">Tổng quan</div>
+            
+            <a href="/admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200 group <%= active === 'dashboard' ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' %>">
+                <div class="flex items-center justify-center w-6 h-6 <%= active === 'dashboard' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300' %> transition-colors">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                Dashboard
+            </a>
+            
+            <a href="/admin/users" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200 group <%= active === 'users' ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' %>">
+                <div class="flex items-center justify-center w-6 h-6 <%= active === 'users' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300' %> transition-colors">
+                    <i class="fas fa-users"></i>
+                </div>
+                Người dùng
+            </a>
 
-</ul>
-    <hr>
-    <div class="dropdown">
-        <a href="/" class="d-flex align-items-center link-dark text-decoration-none">
-            <i class="fas fa-home me-2"></i> <strong>Về trang chủ</strong>
+            <div class="px-3 py-2 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1 mt-4">Nội dung</div>
+        <% } else { %>
+            <div class="px-3 py-2 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1 mt-2">Nội dung</div>
+        <% } %>
+
+        <a href="/admin/campgrounds" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200 group <%= active === 'campgrounds' ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' %>">
+            <div class="flex items-center justify-center w-6 h-6 <%= active === 'campgrounds' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300' %> transition-colors">
+                <i class="fas fa-store"></i>
+            </div>
+            Quản lý Bài đăng
+        </a>
+
+        <a href="/admin/reviews?filter=reported" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200 group <%= active === 'reviews' ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' %>">
+            <div class="flex items-center justify-center w-6 h-6 <%= active === 'reviews' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300' %> transition-colors">
+                <i class="fas fa-comments"></i>
+            </div>
+            Quản lý Đánh giá
+        </a>
+
+        <% if(currentUser.role === 'admin') { %>
+            <div class="px-3 py-2 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1 mt-4">Hệ thống</div>
+            
+            <a href="/admin/categories" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all duration-200 group <%= active === 'categories' ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white' %>">
+                <div class="flex items-center justify-center w-6 h-6 <%= active === 'categories' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300' %> transition-colors">
+                    <i class="fas fa-tags"></i>
+                </div>
+                Danh mục
+            </a>
+        <% } %>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-100 dark:border-gray-800 shrink-0 bg-white dark:bg-dark-card">
+        <a href="/" class="flex items-center justify-center gap-2 w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-bold rounded-xl transition-colors">
+            <i class="fas fa-home"></i> Về trang chủ
         </a>
     </div>
 </div>

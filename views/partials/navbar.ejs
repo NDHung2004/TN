@@ -1,82 +1,144 @@
-<nav class="navbar navbar-expand-lg navbar-dark <%= (typeof generalSetting !== 'undefined' && generalSetting.navColor) ? generalSetting.navColor : 'bg-dark' %> sticky-top">
-    <div class="container-fluid">
-        
-        <a class="navbar-brand fw-bold" href="/">
-            <% if(typeof generalSetting !== 'undefined' && generalSetting.logoUrl) { %>
-                <img src="<%= generalSetting.logoUrl %>" alt="Logo" height="35" class="d-inline-block align-text-top me-2" style="border-radius: 5px;">
-                <span class="d-none d-md-inline"><%= generalSetting.siteTitle || 'Quán Ăn Việt' %></span>
-            <% } else { %>
-                <%= (typeof generalSetting !== 'undefined' && generalSetting.siteTitle) ? generalSetting.siteTitle : 'Quán Ăn Việt' %>
-            <% } %>
-        </a>
+<nav class="fixed top-0 left-0 right-0 z-50 glass shadow-sm transition-all duration-300" id="main-nav">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo & Brand -->
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/" class="flex items-center gap-2 group">
+                    <% if(typeof generalSetting !== 'undefined' && generalSetting.logoUrl) { %>
+                        <img src="<%= generalSetting.logoUrl %>" alt="Logo" class="h-8 w-auto rounded-md group-hover:scale-105 transition-transform duration-300">
+                    <% } else { %>
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+                            Y
+                        </div>
+                    <% } %>
+                    <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                        <%= (typeof generalSetting !== 'undefined' && generalSetting.siteTitle) ? generalSetting.siteTitle : 'YelpCamp' %>
+                    </span>
+                </a>
+            </div>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex md:items-center md:space-x-8">
+                <a href="/campgrounds" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-2">
+                    <i class="fas fa-compass text-primary-500"></i> Khám phá Quán
+                </a>
+                <a href="/campgrounds/new" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-primary-500"></i> Đăng Quán mới
+                </a>
+            </div>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/campgrounds">Khám phá Quán</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/campgrounds/new">Đăng Quán mới</a>
-                </li>
-            </ul>
+            <!-- Desktop Auth / Profile -->
+            <div class="hidden md:flex md:items-center md:space-x-4">
+                <!-- Dark mode toggle -->
+                <button id="theme-toggle" class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors focus:outline-none">
+                    <i class="fas fa-moon hidden dark:block"></i>
+                    <i class="fas fa-sun block dark:hidden"></i>
+                </button>
 
-            <ul class="navbar-nav ms-auto align-items-center">
-                
                 <% if(!currentUser) { %>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Đăng nhập</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-white px-3 ms-2" href="/register">Đăng ký</a>
-                    </li>
+                    <a href="/login" class="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary-600 transition-colors">Đăng nhập</a>
+                    <a href="/register" class="ml-4 px-4 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-full shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                        Đăng ký
+                    </a>
                 <% } else { %>
-                    
                     <% if(currentUser.role === 'admin') { %>
-                        <li class="nav-item me-2">
-                            <a class="nav-link text-warning fw-bold border border-warning rounded px-2" href="/admin">
-                                <i class="fas fa-user-shield"></i> QUẢN TRỊ
-                            </a>
-                        </li>
+                        <a href="/admin" class="text-xs font-bold text-amber-600 dark:text-amber-400 border border-amber-600 dark:border-amber-400 px-3 py-1.5 rounded-full hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors flex items-center gap-1">
+                            <i class="fas fa-user-shield"></i> QUẢN TRỊ
+                        </a>
                     <% } else if(currentUser.role === 'moderator') { %>
-                        <li class="nav-item me-2">
-                            <a class="nav-link text-info fw-bold border border-info rounded px-2" href="/admin/campgrounds">
-                                <i class="fas fa-tasks"></i> DUYỆT BÀI
-                            </a>
-                        </li>
+                        <a href="/admin/campgrounds" class="text-xs font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-600 dark:border-cyan-400 px-3 py-1.5 rounded-full hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition-colors flex items-center gap-1">
+                            <i class="fas fa-tasks"></i> DUYỆT BÀI
+                        </a>
                     <% } %>
 
-                    <li class="nav-item dropdown ms-2">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                            <div class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 30px; height: 30px;">
+                    <!-- Profile Dropdown -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-2 focus:outline-none">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-sm font-bold text-gray-700 dark:text-gray-200 shadow-sm border border-white dark:border-gray-600">
                                 <%= currentUser.username[0].toUpperCase() %>
                             </div>
-                            <%= currentUser.username %>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow">
-                            <li>
-                                <a class="dropdown-item" href="/my-restaurants">
-                                    <i class="fas fa-store me-2 text-primary"></i> Quán của tôi
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= currentUser.username %></span>
+                            <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600 transition-colors"></i>
+                        </button>
+
+                        <!-- Dropdown menu -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
+                            <div class="py-1">
+                                <a href="/my-restaurants" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <i class="fas fa-store text-primary-500 w-4"></i> Quán của tôi
                                 </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/favorites">
-                                    <i class="fas fa-heart me-2 text-danger"></i> Đã thích
+                                <a href="/favorites" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                    <i class="fas fa-heart text-rose-500 w-4"></i> Đã thích
                                 </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" href="/logout">
-                                    <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                                <div class="h-px bg-gray-100 dark:bg-gray-800 my-1"></div>
+                                <a href="/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                                    <i class="fas fa-sign-out-alt w-4"></i> Đăng xuất
                                 </a>
-                            </li>
-                        </ul>
-                    </li>
+                            </div>
+                        </div>
+                    </div>
                 <% } %>
-            </ul>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="flex items-center md:hidden gap-4">
+                <button id="theme-toggle-mobile" class="p-2 text-gray-500 dark:text-gray-400 focus:outline-none">
+                    <i class="fas fa-moon hidden dark:block"></i>
+                    <i class="fas fa-sun block dark:hidden"></i>
+                </button>
+                <button type="button" id="mobile-menu-btn" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="md:hidden hidden bg-white dark:bg-dark-bg border-b border-gray-100 dark:border-gray-800" id="mobile-menu">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            <a href="/campgrounds" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"><i class="fas fa-compass text-primary-500 mr-2 w-5"></i> Khám phá Quán</a>
+            <a href="/campgrounds/new" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"><i class="fas fa-plus-circle text-primary-500 mr-2 w-5"></i> Đăng Quán mới</a>
+            
+            <div class="h-px bg-gray-100 dark:bg-gray-800 my-2"></div>
+            
+            <% if(!currentUser) { %>
+                <a href="/login" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800">Đăng nhập</a>
+                <a href="/register" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">Đăng ký</a>
+            <% } else { %>
+                <div class="px-3 py-2 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold">
+                        <%= currentUser.username[0].toUpperCase() %>
+                    </div>
+                    <span class="text-base font-medium text-gray-900 dark:text-white"><%= currentUser.username %></span>
+                </div>
+                <a href="/my-restaurants" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Quán của tôi</a>
+                <a href="/favorites" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Đã thích</a>
+                <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">Đăng xuất</a>
+            <% } %>
         </div>
     </div>
 </nav>
+
+<script>
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // Dark mode toggles
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeToggleMobileBtn = document.getElementById('theme-toggle-mobile');
+
+    function toggleTheme() {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.theme = 'light';
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+        }
+    }
+
+    if(themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+    if(themeToggleMobileBtn) themeToggleMobileBtn.addEventListener('click', toggleTheme);
+</script>

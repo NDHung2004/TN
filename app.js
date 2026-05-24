@@ -78,6 +78,8 @@ const scriptSrcUrls = [
   "https://kit.fontawesome.com/",
   "https://cdnjs.cloudflare.com/",
   "https://cdn.jsdelivr.net",
+  "https://cdn.tailwindcss.com",
+  "https://unpkg.com/",
 ];
 
 const styleSrcUrls = [
@@ -88,6 +90,8 @@ const styleSrcUrls = [
   "https://fonts.googleapis.com/",
   "https://use.fontawesome.com/",
   "https://cdn.jsdelivr.net",
+  "https://unpkg.com/",
+  "https://cdnjs.cloudflare.com/",
 ];
 
 const connectSrcUrls = [
@@ -103,6 +107,7 @@ const fontSrcUrls = [
   "https://fonts.gstatic.com/",
   "https://use.fontawesome.com/",
   "https://cdn.jsdelivr.net",
+  "https://cdnjs.cloudflare.com/",
   "data:",
 ];
 

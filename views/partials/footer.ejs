@@ -1,96 +1,92 @@
-<footer class="footer mt-auto py-4 bg-dark text-white border-top border-secondary">
-    <div class="container">
-        <div class="row gy-4">
+<footer class="bg-white dark:bg-dark-bg border-t border-gray-200 dark:border-gray-800 mt-auto transition-colors duration-300">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             
-            <div class="col-lg-4 col-md-6">
-                <h5 class="fw-bold text-warning mb-3">
-                    <%= (typeof generalSetting !== 'undefined' && generalSetting.siteTitle) ? generalSetting.siteTitle : 'Quán Ăn Việt' %>
-                </h5>
-                <p class="text-white-50 small">
-                    <%= (typeof generalSetting !== 'undefined' && generalSetting.footer.content) ? generalSetting.footer.content : 'Nơi chia sẻ đam mê ẩm thực.' %>
+            <!-- Brand Section -->
+            <div class="col-span-1" data-aos="fade-up" data-aos-delay="0">
+                <a href="/" class="flex items-center gap-2 mb-4 group">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+                        Y
+                    </div>
+                    <span class="font-bold text-xl text-gray-900 dark:text-white">
+                        <%= (typeof generalSetting !== 'undefined' && generalSetting.siteTitle) ? generalSetting.siteTitle : 'YelpCamp' %>
+                    </span>
+                </a>
+                <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-xs">
+                    <%= (typeof generalSetting !== 'undefined' && generalSetting.footer.content) ? generalSetting.footer.content : 'Nơi lý tưởng để bạn khám phá và chia sẻ những quán ăn, địa điểm cắm trại tuyệt vời nhất.' %>
                 </p>
             </div>
 
-            <div class="col-lg-4 col-md-6">
-                <h5 class="fw-bold text-white mb-3" style="font-size: 1rem;">Thông tin liên hệ</h5>
-                <ul class="list-unstyled text-white-50 small">
+            <!-- Contact Section -->
+            <div class="col-span-1" data-aos="fade-up" data-aos-delay="100">
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Liên hệ</h3>
+                <ul class="space-y-3">
                     <% if(typeof generalSetting !== 'undefined' && generalSetting.footer.address) { %>
-                        <li class="mb-2">Địa chỉ: <%= generalSetting.footer.address %></li>
+                        <li class="flex items-start gap-3 text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-map-marker-alt mt-1 text-primary-500"></i>
+                            <span><%= generalSetting.footer.address %></span>
+                        </li>
                     <% } %>
                     <% if(typeof generalSetting !== 'undefined' && generalSetting.footer.email) { %>
-                        <li class="mb-2">Email: <%= generalSetting.footer.email %></li>
+                        <li class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-envelope text-primary-500"></i>
+                            <a href="mailto:<%= generalSetting.footer.email %>" class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"><%= generalSetting.footer.email %></a>
+                        </li>
                     <% } %>
                     <% if(typeof generalSetting !== 'undefined' && generalSetting.hotline) { %>
-                        <li class="mb-2">Hotline: <span class="text-warning fw-bold"><%= generalSetting.hotline %></span></li>
+                        <li class="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-phone-alt text-primary-500"></i>
+                            <a href="tel:<%= generalSetting.hotline %>" class="font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors"><%= generalSetting.hotline %></a>
+                        </li>
                     <% } %>
                 </ul>
             </div>
 
-            <div class="col-lg-4 col-md-12">
-                <h5 class="fw-bold text-white mb-3" style="font-size: 1rem;">Kết nối</h5>
-                <div class="d-flex gap-2">
+            <!-- Social Links -->
+            <div class="col-span-1" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Kết nối với chúng tôi</h3>
+                <div class="flex gap-3">
                     <% if(typeof generalSetting !== 'undefined' && generalSetting.footer.socials) { %>
                         
                         <% if(generalSetting.footer.socials.facebook) { %>
-                            <a href="<%= generalSetting.footer.socials.facebook %>" class="social-text-btn facebook" target="_blank">FB</a>
+                            <a href="<%= generalSetting.footer.socials.facebook %>" target="_blank" aria-label="Facebook" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-[#1877F2] hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-[#1877F2] dark:hover:text-white transition-all duration-300">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
                         <% } %>
                         
                         <% if(generalSetting.footer.socials.youtube) { %>
-                            <a href="<%= generalSetting.footer.socials.youtube %>" class="social-text-btn youtube" target="_blank">YTB</a>
+                            <a href="<%= generalSetting.footer.socials.youtube %>" target="_blank" aria-label="YouTube" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-[#FF0000] hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-[#FF0000] dark:hover:text-white transition-all duration-300">
+                                <i class="fab fa-youtube"></i>
+                            </a>
                         <% } %>
                         
                         <% if(generalSetting.footer.socials.tiktok) { %>
-                            <a href="<%= generalSetting.footer.socials.tiktok %>" class="social-text-btn tiktok" target="_blank">TikTok</a>
+                            <a href="<%= generalSetting.footer.socials.tiktok %>" target="_blank" aria-label="TikTok" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-black hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-black transition-all duration-300">
+                                <i class="fab fa-tiktok"></i>
+                            </a>
                         <% } %>
 
+                    <% } else { %>
+                        <!-- Fallback default social links if no setting -->
+                        <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-[#1877F2] hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-[#1877F2] dark:hover:text-white transition-all duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-black hover:text-white dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white dark:hover:text-black transition-all duration-300">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
                     <% } %>
                 </div>
             </div>
         </div>
 
-        <hr class="border-secondary my-4">
-        <div class="text-center text-white-50 small">
-            <%= (typeof generalSetting !== 'undefined' && generalSetting.footer.copyright) ? generalSetting.footer.copyright : '© 2026 Copyright' %>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                <%= (typeof generalSetting !== 'undefined' && generalSetting.footer.copyright) ? generalSetting.footer.copyright : '© ' + new Date().getFullYear() + ' YelpCamp. All rights reserved.' %>
+            </p>
+            <div class="flex gap-6 text-sm text-gray-500 dark:text-gray-400">
+                <a href="#" class="hover:text-gray-900 dark:hover:text-white transition-colors">Bảo mật</a>
+                <a href="#" class="hover:text-gray-900 dark:hover:text-white transition-colors">Điều khoản</a>
+            </div>
         </div>
     </div>
 </footer>
-
-<style>
-    /* CSS CHO NÚT CHỮ (TEXT BUTTONS) */
-    .social-text-btn {
-        display: inline-block;
-        padding: 5px 12px;       /* Khoảng cách lề chữ */
-        border-radius: 4px;      /* Bo góc nhẹ */
-        font-weight: bold;       /* Chữ đậm */
-        font-size: 0.85rem;      /* Cỡ chữ vừa phải */
-        text-decoration: none;   /* Bỏ gạch chân */
-        color: white;            /* Chữ màu trắng */
-        background-color: #444;  /* Màu nền mặc định (xám tối) */
-        transition: all 0.3s;    /* Hiệu ứng mượt */
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    /* Màu sắc riêng khi di chuột vào từng nút */
-    .social-text-btn.facebook:hover {
-        background-color: #1877F2; /* Xanh FB */
-        border-color: #1877F2;
-        color: white;
-    }
-
-    .social-text-btn.youtube:hover {
-        background-color: #FF0000; /* Đỏ Youtube */
-        border-color: #FF0000;
-        color: white;
-    }
-
-    .social-text-btn.tiktok:hover {
-        background-color: #000000; /* Đen Tiktok */
-        border-color: #ffffff;
-        color: white;
-    }
-
-    /* Các CSS phụ trợ khác */
-    .text-white-50 { color: rgba(255, 255, 255, 0.7) !important; }
-    body { display: flex; flex-direction: column; min-height: 100vh; }
-    footer { margin-top: auto; }
-</style>

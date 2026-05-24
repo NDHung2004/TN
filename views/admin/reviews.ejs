@@ -1,83 +1,153 @@
 <% layout('layouts/boilerplate') %>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-2 p-0">
-            <%- include('../partials/adminSidebar') %>
+<div class="flex min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <!-- Sidebar -->
+    <div class="hidden md:block sticky top-0 h-screen">
+        <%- include('../partials/adminSidebar') %>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6 md:p-10 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-aos="fade-right">Quản lý Đánh giá & Bình luận</h1>
         </div>
 
-        <div class="col-md-10 p-4">
-            <h1>Quản lý Bình luận & Đánh giá</h1>
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 dark:border-gray-800 mb-6" data-aos="fade-up" data-aos-delay="0">
+            <nav class="-mb-px flex space-x-6 overflow-x-auto custom-scrollbar">
+                <a href="/admin/reviews" class="<%= !filter ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' %> whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                    Tất cả
+                </a>
+                <a href="/admin/reviews?filter=reported" class="<%= filter === 'reported' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' %> whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center">
+                    Bị báo cáo 
+                    <span class="ml-2 bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400 py-0.5 px-2 rounded-full text-xs">!</span>
+                </a>
+            </nav>
+        </div>
 
-            <ul class="nav nav-tabs mb-4">
-                <li class="nav-item">
-                    <a class="nav-link <%= !filter ? 'active' : '' %>" href="/admin/reviews">Tất cả</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <%= filter === 'reported' ? 'active' : '' %>" href="/admin/reviews?filter=reported">
-                        Bị báo cáo <span class="badge bg-danger">!</span>
-                    </a>
-                </li>
-            </ul>
+        <!-- Card Container -->
+        <div class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                    <thead class="bg-gray-50 dark:bg-gray-800/50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-5/12">Nội dung</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Đánh giá</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Người đăng</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Trạng thái</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        <% for(let review of reviews) { %>
+                            <tr class="transition-colors <%= review.isReported ? 'bg-amber-50/50 hover:bg-amber-50 dark:bg-amber-900/10 dark:hover:bg-amber-900/20' : 'bg-white hover:bg-gray-50 dark:bg-dark-card dark:hover:bg-gray-800/50' %>">
+                                
+                                <!-- Content -->
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900 dark:text-gray-300 whitespace-pre-wrap break-words line-clamp-3"><%= review.body %></div>
+                                    <div class="text-xs text-gray-400 dark:text-gray-500 mt-1 font-mono">ID: <%= review._id %></div>
+                                </td>
 
-            <div class="card shadow">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th style="width: 40%">Nội dung</th>
-                                    <th>Đánh giá</th>
-                                    <th>Người đăng</th>
-                                    <th>Trạng thái</th>
-                                    <th>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for(let review of reviews) { %>
-                                <tr class="<%= review.isReported ? 'table-warning' : '' %>">
-                                    
-                                    <td>
-                                        <p class="mb-1 text-break"><%= review.body %></p>
-                                        <small class="text-muted">ID: <%= review._id %></small>
-                                    </td>
+                                <!-- Rating -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center text-amber-500 dark:text-amber-400 font-bold text-sm">
+                                        <%= review.rating %> <i class="fas fa-star ml-1 text-xs"></i>
+                                    </div>
+                                </td>
 
-                                    <td>
-                                        <span class="text-warning fw-bold"><%= review.rating %> <i class="fas fa-star"></i></span>
-                                    </td>
+                                <!-- Author -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 mr-2">
+                                            <%= review.author ? review.author.username[0].toUpperCase() : '?' %>
+                                        </div>
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300"><%= review.author ? review.author.username : 'Unknown' %></span>
+                                    </div>
+                                </td>
 
-                                    <td><%= review.author ? review.author.username : 'Unknown' %></td>
+                                <!-- Status -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <% if(review.isReported) { %>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400">
+                                            <i class="fas fa-flag mr-1"></i> Bị báo cáo
+                                        </span>
+                                    <% } else { %>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                            <i class="fas fa-check mr-1"></i> Bình thường
+                                        </span>
+                                    <% } %>
+                                </td>
 
-                                    <td>
+                                <!-- Actions -->
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end gap-2">
                                         <% if(review.isReported) { %>
-                                            <span class="badge bg-danger">Bị báo cáo</span>
-                                        <% } else { %>
-                                            <span class="badge bg-success">Sạch</span>
-                                        <% } %>
-                                    </td>
-
-                                    <td>
-                                        <% if(review.isReported) { %>
-                                            <form action="/admin/reviews/<%= review._id %>/dismiss?_method=PATCH" method="POST" class="d-inline">
-                                                <button class="btn btn-sm btn-success" title="Giữ lại (Gỡ báo cáo)">
-                                                    <i class="fas fa-check">Giữ lại</i>
+                                            <form action="/admin/reviews/<%= review._id %>/dismiss?_method=PATCH" method="POST" class="inline-block">
+                                                <button type="submit" class="p-2 text-emerald-600 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 rounded-lg transition-colors" title="Bỏ qua báo cáo (Giữ lại)">
+                                                    <i class="fas fa-shield-alt"></i>
                                                 </button>
                                             </form>
                                         <% } %>
 
-                                        <form action="/admin/reviews/<%= review._id %>?_method=DELETE" method="POST" class="d-inline">
-                                            <button class="btn btn-sm btn-danger" onclick="return confirm('Xóa vĩnh viễn bình luận này?')" title="Xóa bình luận">
-                                                <i class="fas fa-trash">Xóa</i>
+                                        <form action="/admin/reviews/<%= review._id %>?_method=DELETE" method="POST" class="inline-block" onsubmit="return confirm('Bạn chắc chắn muốn xóa vĩnh viễn bình luận này?');">
+                                            <button type="submit" class="p-2 text-rose-600 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 rounded-lg transition-colors" title="Xóa bình luận">
+                                                <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </form>
-                                    </td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% } %>
+
+                        <% if(reviews.length === 0) { %>
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-dark-card">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <i class="fas fa-check-circle text-4xl mb-3 text-emerald-400 dark:text-emerald-500/50"></i>
+                                        <p>Không có bình luận nào ở đây cả.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
             </div>
         </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <div class="mt-6 flex justify-center" data-aos="fade-up" data-aos-delay="200">
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <!-- Nút Previous -->
+                    <a href="/admin/reviews?page=<%= currentPage > 1 ? currentPage - 1 : 1 %><%= filter ? '&filter=' + filter : '' %>" 
+                       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 <%= currentPage === 1 ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' %>">
+                        <span class="sr-only">Previous</span>
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+
+                    <!-- Các số trang -->
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <% if(i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) { %>
+                            <a href="/admin/reviews?page=<%= i %><%= filter ? '&filter=' + filter : '' %>" 
+                               aria-current="page" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium <%= i === currentPage ? 'z-10 bg-primary-50 dark:bg-primary-900/30 border-primary-500 text-primary-600 dark:text-primary-400' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' %>">
+                                <%= i %>
+                            </a>
+                        <% } else if (i === currentPage - 3 || i === currentPage + 3) { %>
+                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-400">
+                                ...
+                            </span>
+                        <% } %>
+                    <% } %>
+
+                    <!-- Nút Next -->
+                    <a href="/admin/reviews?page=<%= currentPage < totalPages ? currentPage + 1 : totalPages %><%= filter ? '&filter=' + filter : '' %>" 
+                       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 <%= currentPage === totalPages ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' %>">
+                        <span class="sr-only">Next</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </nav>
+            </div>
+        <% } %>
     </div>
 </div>

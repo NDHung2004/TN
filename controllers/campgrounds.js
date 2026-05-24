@@ -170,13 +170,87 @@ module.exports.toggleFavorite = async (req, res) => {
     
     if (user.favorites.includes(id)) {
        
-        await User.findByIdAndUpdate(req.user._id, { $pull: { favorites: id } });
+        await User.findByIdAndUpdate(req.user._id, {
+            $pull: { favorites: id }
+        });
         req.flash('success', 'Đã xóa khỏi danh sách yêu thích!');
     } else {
-       
-        await User.findByIdAndUpdate(req.user._id, { $addToSet: { favorites: id } });
+        await User.findByIdAndUpdate(req.user._id, {
+            $addToSet: { favorites: id }
+        });
         req.flash('success', 'Đã thêm vào danh sách yêu thích!');
     }
+    res.redirect(req.get('Referrer') || '/campgrounds');
+};
+
+module.exports.seedNearby = async (req, res) => {
+    const { lat, lng } = req.body;
+    if (!lat || !lng) {
+        req.flash('error', 'Không tìm thấy tọa độ của bạn!');
+        return res.redirect('/campgrounds');
+    }
+
+    let user = await User.findOne({ role: 'admin' });
+    if (!user) user = await User.findOne();
     
-    res.redirect('back'); 
+    if (!user) {
+        req.flash('error', 'Không tìm thấy user để gán quyền tác giả!');
+        return res.redirect('/campgrounds');
+    }
+
+    const Review = require('../models/reviews');
+
+    const sampleImages = [
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=80"
+    ];
+    const adjectives = ["Ngon", "Tuyệt Đỉnh", "Bình Dân", "Sang Trọng"];
+    const nouns = ["Phở", "Bún", "Lẩu", "Nướng BBQ", "Cà Phê"];
+    const sample = array => array[Math.floor(Math.random() * array.length)];
+    
+    const baseLat = parseFloat(lat);
+    const baseLng = parseFloat(lng);
+
+    for (let i = 0; i < 20; i++) {
+        // Tạo tọa độ ngẫu nhiên xung quanh điểm gốc (khoảng 10-30km)
+        const latOffset = (Math.random() - 0.5) * 0.4;
+        const lngOffset = (Math.random() - 0.5) * 0.4;
+        
+        const camp = new Campground({
+            author: user._id,
+            title: `[GẦN ĐÂY] ${sample(nouns)} ${sample(adjectives)} ${i+1}`,
+            location: "Gần Vị Trí Của Bạn",
+            description: "Một quán ăn ngon được tạo tự động gần vị trí của bạn.",
+            price: Math.floor(Math.random() * 200000) + 30000,
+            category: sample(["Phở", "Bún", "Lẩu", "Nướng"]),
+            geometry: {
+                type: "Point",
+                coordinates: [baseLng + lngOffset, baseLat + latOffset]
+            },
+            images: [
+                { url: sample(sampleImages), filename: `Nearby_1_${i}` },
+                { url: sample(sampleImages), filename: `Nearby_2_${i}` }
+            ],
+            status: 'approved'
+        });
+
+        for (let j = 0; j < 3; j++) {
+            const review = new Review({
+                rating: Math.floor(Math.random() * 3) + 3,
+                body: "Rất ngon và đáng thử!",
+                sentiment: "positive",
+                author: user._id,
+                isToxic: false
+            });
+            await review.save();
+            camp.reviews.push(review);
+        }
+
+        await camp.save();
+    }
+
+    req.flash('success', 'Đã thêm 20 quán ăn gần vị trí của bạn!');
+    res.redirect(`/campgrounds?lat=${baseLat}&lng=${baseLng}&distance=50`);
 };

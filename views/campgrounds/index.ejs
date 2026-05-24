@@ -1,108 +1,233 @@
 <% layout("/layouts/boilerplate") %>
 
-<div id="cluster-map" style="width: 100%; height: 500px"></div>
-
-<h1 class="mb-3 mt-3">Tất cả quán ăn</h1>
-<div class="row mb-4">
-  <div class="col-md-6 offset-md-3">
-    <form action="/campgrounds" method="GET" class="input-group shadow-sm">
-      <input 
-        type="text" 
-        name="search" 
-        class="form-control" 
-        placeholder="Tìm tên quán, địa điểm, món ăn..." 
-        value="<%= search %>" 
-      >
-      <button class="btn btn-primary" type="submit">Tìm kiếm</button>
-      <% if(search) { %>
-        <a href="/campgrounds" class="btn btn-outline-secondary">Xóa lọc</a>
-      <% } %>
-    </form>
-  </div>
-</div>
-<div class="mb-3">
-  <a class="btn btn-success" href="/campgrounds/new">Thêm quán ăn mới</a>
+<!-- Header Section -->
+<div class="mb-10 text-center" data-aos="fade-down">
+    <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-4">Khám phá Quán Ăn</h1>
+    <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">Tìm kiếm những địa điểm ẩm thực tuyệt vời nhất được đánh giá bởi cộng đồng.</p>
 </div>
 
-<% for (let campground of campgrounds) {%>
-<div class="card mb-3 campgroundBg">
-  <div class="row">
-    <div class="col-md-3">
-      <% if (campground.images.length) { %>
-      <img
-        src="<%=campground.images[0].url %>"
-        class="img-fluid campgroundThumbnailSize"
-        style="width: 100%; height: 200px; object-fit: cover;" 
-      />
-      <% } else { %>
-      <img
-        src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop"
-        alt="Vietnamese food"
-        class="img-fluid"
-        style="width: 100%; height: 200px; object-fit: cover;"
-      />
-      <% } %>
+<!-- Map Section -->
+<div class="mb-12 rounded-2xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800" data-aos="fade-up">
+    <div id="cluster-map" class="w-full h-[250px] md:h-[350px]"></div>
+</div>
+
+<!-- Search and Action Bar -->
+<div class="bg-white dark:bg-dark-card p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 mb-10 flex flex-col md:flex-row gap-4 justify-between items-center" data-aos="fade-up" data-aos-delay="100">
+    <div class="w-full md:w-1/2">
+        <form action="/campgrounds" method="GET" class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+            </div>
+            <input 
+                type="text" 
+                name="search" 
+                class="block w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl leading-5 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors sm:text-sm" 
+                placeholder="Tìm tên quán, địa điểm, món ăn..." 
+                value="<%= search %>" 
+            >
+            <div class="absolute inset-y-0 right-0 flex items-center">
+                <% if(search || typeof lat !== 'undefined') { %>
+                    <a href="/campgrounds" class="p-2 mr-1 text-gray-400 hover:text-red-500 transition-colors" title="Xóa lọc">
+                        <i class="fas fa-times"></i>
+                    </a>
+                <% } %>
+                <button type="submit" class="h-full px-4 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-r-xl transition-colors border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    Tìm kiếm
+                </button>
+            </div>
+        </form>
     </div>
-
-    <div class="col-md-8">
-      <div class="card-body">
-        <h5 class="card-title text-white"><%=campground.title%></h5>
-        <span class="badge rounded-pill bg-info text-dark mb-2">
-            <i class="fas fa-tag small"></i> <%= campground.category || 'Ẩm thực' %>
-        </span>
-        <p class="card-text text-white"><%=campground.description%></p>
-        <p class="card-text">
-          <small class="text-secondary"><%=campground.location%></small>
-        </p>
-
-        <a href="/campgrounds/<%=campground._id %>" class="btn btn-primary">
-          Xem chi tiết <%=campground.title %>
+    <div class="w-full md:w-auto flex flex-col sm:flex-row justify-end gap-3">
+        <button id="findNearbyBtn" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-primary-700 bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-900/50 shadow-sm transition-all duration-300 w-full sm:w-auto">
+            <i class="fas fa-location-arrow mr-2"></i>
+            Tìm quanh đây
+        </button>
+        <a href="/campgrounds/new" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-gray-900 dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-md hover:shadow-lg transition-all duration-300 w-full sm:w-auto">
+            <i class="fas fa-plus mr-2"></i>
+            Thêm quán ăn mới
         </a>
-      </div>
     </div>
-  </div>
 </div>
+
+<!-- Nearby Filters (Only show if searching nearby) -->
+<% if (typeof lat !== 'undefined' && lat && typeof lng !== 'undefined' && lng) { %>
+    <div class="mb-8 flex justify-center" data-aos="fade-up" data-aos-delay="150">
+        <div class="inline-flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl shadow-sm">
+            <a href="/campgrounds?lat=<%= lat %>&lng=<%= lng %>&distance=50&sort=nearest" 
+               class="px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 <%= sortMode === 'nearest' ? 'bg-white dark:bg-dark-card text-primary-600 dark:text-primary-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' %>">
+               <i class="fas fa-map-marker-alt mr-1.5"></i> Gần nhất
+            </a>
+            <a href="/campgrounds?lat=<%= lat %>&lng=<%= lng %>&distance=50&sort=hot" 
+               class="px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 <%= sortMode === 'hot' ? 'bg-white dark:bg-dark-card text-rose-600 dark:text-rose-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' %>">
+               <i class="fas fa-fire mr-1.5"></i> Hot
+            </a>
+            <a href="/campgrounds?lat=<%= lat %>&lng=<%= lng %>&distance=50&sort=best" 
+               class="px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 <%= sortMode === 'best' ? 'bg-white dark:bg-dark-card text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white' %>">
+               <i class="fas fa-star mr-1.5"></i> Tốt nhất
+            </a>
+            <form action="/campgrounds/seed-nearby" method="POST" class="inline-block ml-2">
+                <input type="hidden" name="lat" value="<%= lat %>">
+                <input type="hidden" name="lng" value="<%= lng %>">
+                <button type="submit" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors shadow-sm" title="Tạo tự động 20 quán ăn ở gần">
+                    <i class="fas fa-magic mr-1.5"></i> Thêm 20 Quán
+                </button>
+            </form>
+        </div>
+    </div>
 <% } %>
 
+<!-- Campgrounds Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+    <% for (let i = 0; i < campgrounds.length; i++) { %>
+        <% let campground = campgrounds[i]; %>
+        <div class="bg-white dark:bg-dark-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 group flex flex-col h-full" data-aos="fade-up" data-aos-delay="<%= (i % 4) * 50 %>">
+            
+            <!-- Image Container -->
+            <div class="relative h-56 overflow-hidden">
+                <% if (campground.images.length) { %>
+                    <img src="<%=campground.images[0].url %>" alt="<%= campground.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <% } else { %>
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="Vietnamese food" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <% } %>
+                <div class="absolute top-3 left-3 bg-white/90 dark:bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-primary-600 dark:text-primary-400 shadow-sm flex items-center gap-1">
+                    <i class="fas fa-tag text-[10px]"></i> <%= campground.category || 'Ẩm thực' %>
+                </div>
+            </div>
+
+            <!-- Content Container -->
+            <div class="p-5 flex flex-col flex-grow">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white line-clamp-1 mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    <%= campground.title %>
+                </h3>
+                
+                <p class="text-sm text-gray-500 dark:text-gray-400 flex items-start gap-1.5 mb-3 line-clamp-1">
+                    <i class="fas fa-map-marker-alt mt-1 text-gray-400 shrink-0"></i>
+                    <span><%= campground.location %></span>
+                </p>
+                
+                <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-3 flex-grow">
+                    <%= campground.description %>
+                </p>
+
+                <!-- Statistics Badges -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300" title="Lượt truy cập">
+                        <i class="fas fa-eye mr-1 text-gray-500"></i> <%= campground.views || 0 %>
+                    </span>
+                    <% if (campground.dist && campground.dist.calculated) { %>
+                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" title="Khoảng cách">
+                            <i class="fas fa-route mr-1 text-blue-500"></i> <%= (campground.dist.calculated / 1000).toFixed(1) %> km
+                        </span>
+                    <% } %>
+                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" title="Đánh giá trung bình">
+                        <i class="fas fa-star mr-1 text-yellow-500"></i> <%= campground.avgRating ? campground.avgRating.toFixed(1) : 'Chưa có' %>
+                        <% if(campground.reviewCount) { %> <span class="ml-1 text-yellow-600/70 dark:text-yellow-500/70">(<%= campground.reviewCount %>)</span> <% } %>
+                    </span>
+                    <% if (campground.positiveRatio !== undefined && campground.reviewCount > 0) { %>
+                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium <%= campground.positiveRatio >= 50 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' %>" title="Tỉ lệ tích cực">
+                            <i class="fas <%= campground.positiveRatio >= 50 ? 'fa-thumbs-up text-emerald-500' : 'fa-thumbs-down text-rose-500' %> mr-1"></i> <%= Math.round(campground.positiveRatio) %>%
+                        </span>
+                    <% } %>
+                </div>
+
+                <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <a href="/campgrounds/<%= campground._id %>" class="block w-full py-2.5 px-4 text-center text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<!-- Empty State -->
+<% if (campgrounds.length === 0) { %>
+    <div class="text-center py-20 bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm" data-aos="fade-up">
+        <div class="w-20 h-20 mx-auto bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-search text-3xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Không tìm thấy kết quả</h3>
+        <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Chúng tôi không tìm thấy quán ăn nào khớp với tìm kiếm của bạn. Hãy thử từ khóa khác.</p>
+        <a href="/campgrounds" class="inline-flex items-center text-primary-600 dark:text-primary-400 hover:underline">
+            <i class="fas fa-arrow-left mr-2"></i> Quay lại tất cả quán ăn
+        </a>
+    </div>
+<% } %>
+
+<!-- Pagination -->
 <% if (totalPages > 1) { %>
-<nav aria-label="Page navigation" class="mt-4 mb-5">
-  <ul class="pagination justify-content-center">
-    
-    <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-      <a class="page-link" href="/campgrounds?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %>">Trước</a>
-    </li>
+    <div class="flex justify-center mt-8 mb-16" data-aos="fade-up">
+        <nav class="inline-flex rounded-xl shadow-sm bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 p-1" aria-label="Pagination">
+            
+            <a href="<%= currentPage == 1 ? '#' : '/campgrounds?page=' + (currentPage - 1) + (search ? '&search=' + search : '') %>" 
+               class="relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg <%= currentPage == 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors' %>">
+                <i class="fas fa-chevron-left mr-1 text-xs"></i> Trước
+            </a>
 
-    <% 
-       let startPage = Math.max(1, currentPage - 2);
-       let endPage = Math.min(totalPages, currentPage + 2);
-    %>
+            <% 
+               let startPage = Math.max(1, currentPage - 2);
+               let endPage = Math.min(totalPages, currentPage + 2);
+            %>
 
-    <% if (startPage > 1) { %>
-        <li class="page-item"><a class="page-link" href="/campgrounds?page=1<%= search ? '&search=' + search : '' %>">1</a></li>
-        <% if (startPage > 2) { %> <li class="page-item disabled"><span class="page-link">...</span></li> <% } %>
-    <% } %>
+            <% if (startPage > 1) { %>
+                <a href="/campgrounds?page=1<%= search ? '&search=' + search : '' %>" class="relative inline-flex items-center px-3.5 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">1</a>
+                <% if (startPage > 2) { %> 
+                    <span class="relative inline-flex items-center px-3.5 py-2 text-sm font-medium text-gray-500">...</span> 
+                <% } %>
+            <% } %>
 
-    <% for(let i = startPage; i <= endPage; i++) { %>
-        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-            <a class="page-link" href="/campgrounds?page=<%= i %><%= search ? '&search=' + search : '' %>"><%= i %></a>
-        </li>
-    <% } %>
+            <% for(let i = startPage; i <= endPage; i++) { %>
+                <a href="/campgrounds?page=<%= i %><%= search ? '&search=' + search : '' %>" 
+                   class="relative inline-flex items-center px-3.5 py-2 text-sm font-medium rounded-lg transition-colors <%= currentPage === i ? 'z-10 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-bold' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800' %>">
+                    <%= i %>
+                </a>
+            <% } %>
 
-    <% if (endPage < totalPages) { %>
-        <% if (endPage < totalPages - 1) { %> <li class="page-item disabled"><span class="page-link">...</span></li> <% } %>
-        <li class="page-item"><a class="page-link" href="/campgrounds?page=<%= totalPages %><%= search ? '&search=' + search : '' %>"><%= totalPages %></a></li>
-    <% } %>
+            <% if (endPage < totalPages) { %>
+                <% if (endPage < totalPages - 1) { %> 
+                    <span class="relative inline-flex items-center px-3.5 py-2 text-sm font-medium text-gray-500">...</span> 
+                <% } %>
+                <a href="/campgrounds?page=<%= totalPages %><%= search ? '&search=' + search : '' %>" class="relative inline-flex items-center px-3.5 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"><%= totalPages %></a>
+            <% } %>
 
-    <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-      <a class="page-link" href="/campgrounds?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %>">Sau</a>
-    </li>
-  </ul>
-</nav>
+            <a href="<%= currentPage == totalPages ? '#' : '/campgrounds?page=' + (currentPage + 1) + (search ? '&search=' + search : '') %>" 
+               class="relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg <%= currentPage == totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors' %>">
+                Sau <i class="fas fa-chevron-right ml-1 text-xs"></i>
+            </a>
+            
+        </nav>
+    </div>
 <% } %>
 
 <script>
   const mapToken = "<%-process.env.MAPBOX_TOKEN %>";
- 
   const campgrounds = {features: <%- JSON.stringify(allCampgroundsForMap) %>};
+
+  // Find Nearby Logic
+  document.getElementById('findNearbyBtn').addEventListener('click', () => {
+      const btn = document.getElementById('findNearbyBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Đang tìm...';
+      btn.disabled = true;
+
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+              (position) => {
+                  const lat = position.coords.latitude;
+                  const lng = position.coords.longitude;
+                  window.location.href = `/campgrounds?lat=${lat}&lng=${lng}&distance=50`;
+              },
+              (error) => {
+                  alert('Không thể lấy vị trí của bạn. Vui lòng cấp quyền vị trí cho trình duyệt.');
+                  btn.innerHTML = originalText;
+                  btn.disabled = false;
+              }
+          );
+      } else {
+          alert('Trình duyệt của bạn không hỗ trợ định vị.');
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+      }
+  });
 </script>
 <script src="/javascript/clustermap.js"></script>
