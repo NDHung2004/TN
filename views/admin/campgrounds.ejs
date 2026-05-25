@@ -11,9 +11,14 @@
         
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-aos="fade-right">Quản lý Bài Đăng</h1>
-            <a href="/campgrounds/new" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-xl shadow-sm transition-colors" data-aos="fade-left">
-                <i class="fas fa-plus mr-2"></i> Thêm quán ăn mới
-            </a>
+            <div class="flex items-center gap-3">
+                <button type="button" id="btnExportExcel" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl shadow-sm transition-colors" data-aos="fade-left">
+                    <i class="fas fa-file-excel mr-2"></i> Xuất Excel
+                </button>
+                <a href="/campgrounds/new" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-xl shadow-sm transition-colors" data-aos="fade-left" data-aos-delay="100">
+                    <i class="fas fa-plus mr-2"></i> Thêm quán ăn mới
+                </a>
+            </div>
         </div>
 
         <!-- Tabs -->
@@ -59,7 +64,14 @@
             </div>
 
             <!-- Table & Bulk Form -->
-            <form action="/admin/campgrounds/bulk?_method=PATCH" method="POST" id="bulkForm">
+            <!-- Hidden Bulk Form -->
+            <form action="/admin/campgrounds/bulk?_method=PATCH" method="POST" id="bulkForm" class="hidden">
+                <input type="hidden" name="action" id="bulkActionInput" value="">
+                <div id="bulkIdsContainer"></div>
+            </form>
+
+            <!-- Table Container -->
+            <div>
                 <!-- Bulk Actions Toolbar -->
                 <div class="px-6 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30 flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -73,8 +85,6 @@
                         <button type="button" class="btn-bulk-action px-3 py-1.5 bg-rose-100 text-rose-700 hover:bg-rose-200 dark:bg-rose-900/30 dark:text-rose-400 rounded-lg text-sm font-medium transition-colors cursor-pointer" data-action="delete" data-title="Xóa các quán ăn đã chọn?" data-text="Hành động này không thể hoàn tác. Toàn bộ dữ liệu liên quan sẽ bị xóa vĩnh viễn!" data-icon="error" data-confirm="Xóa Vĩnh Viễn" data-color="#EF4444">
                             <i class="fas fa-trash-alt mr-1"></i> Xóa
                         </button>
-                        <!-- Hidden input to store the action -->
-                        <input type="hidden" name="action" id="bulkActionInput" value="">
                     </div>
                 </div>
 
@@ -199,7 +209,7 @@
                     </tbody>
                 </table>
             </div>
-            </form>
+            </div>
 
             <!-- Pagination -->
             <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
@@ -338,9 +348,73 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         bulkActionInput.value = action;
+                        const container = document.getElementById('bulkIdsContainer');
+                        container.innerHTML = '';
+                        document.querySelectorAll('.rowCheckbox:checked').forEach(cb => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'campgroundIds';
+                            input.value = cb.value;
+                            container.appendChild(input);
+                        });
                         bulkForm.submit();
                     }
                 });
+            });
+        });
+        
+        // --- XUẤT EXCEL CÓ TÙY CHỌN ---
+        document.getElementById('btnExportExcel').addEventListener('click', () => {
+            Swal.fire({
+                title: 'Tùy chọn Xuất Excel',
+                customClass: {
+                    popup: 'rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 dark:bg-gray-900',
+                    title: 'text-2xl font-extrabold text-gray-900 dark:text-white pt-4',
+                    confirmButton: 'px-6 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-sm',
+                    cancelButton: 'px-6 py-2.5 bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ml-3'
+                },
+                buttonsStyling: false,
+                html: `
+                    <div class="text-left mt-4 px-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Trạng thái duyệt</label>
+                        <select id="swal-status" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none mb-5 transition-colors">
+                            <option value="all">Tất cả</option>
+                            <option value="approved">Đã duyệt</option>
+                            <option value="pending">Chờ duyệt</option>
+                            <option value="rejected">Bị từ chối</option>
+                        </select>
+
+                        <div class="flex gap-4">
+                            <div class="w-1/2">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Từ trang</label>
+                                <input id="swal-page-from" type="number" min="1" value="1" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors" placeholder="1">
+                            </div>
+                            <div class="w-1/2">
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Đến trang</label>
+                                <input id="swal-page-to" type="number" min="1" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors" placeholder="Tất cả">
+                            </div>
+                        </div>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-file-download mr-1"></i> Tải xuống',
+                cancelButtonText: 'Hủy',
+                preConfirm: () => {
+                    return {
+                        status: document.getElementById('swal-status').value,
+                        pageFrom: document.getElementById('swal-page-from').value,
+                        pageTo: document.getElementById('swal-page-to').value
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const v = result.value;
+                    let url = '/admin/campgrounds/export?status=' + v.status;
+                    if(v.pageFrom) url += '&pageFrom=' + v.pageFrom;
+                    if(v.pageTo) url += '&pageTo=' + v.pageTo;
+                    window.location.href = url;
+                }
             });
         });
     });

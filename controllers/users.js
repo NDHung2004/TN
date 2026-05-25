@@ -9,7 +9,7 @@ module.exports.renderLogin = (req, res) => {
 };
 
 module.exports.login = (req, res) => {
-  req.flash("success", "Welcome back!");
+  req.flash("success", "Chào mừng bạn quay lại!");
   const redirectUrl = req.session.returnTo || "/campgrounds";
   delete req.session.returnTo;
   res.redirect(redirectUrl);
@@ -20,7 +20,7 @@ module.exports.logout = (req, res, next) => {
     if (err) {
       return next(err);
     }
-    req.flash("success", "Goodbye!");
+    req.flash("success", "Tạm biệt!");
     res.redirect("/campgrounds");
   });
 };

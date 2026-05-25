@@ -7,6 +7,7 @@ const { storage } = require('../cloudinary/index.js'); // Trỏ đúng file clou
 const upload = multer({ storage });
 router.get('/', isLoggedIn, isAdmin, adminController.index);
 // --- CÁC ROUTE MỚI CHO USER ---
+router.get('/users/export', isLoggedIn, isAdmin, adminController.exportUsers);
 // 1. Xem danh sách
 router.get('/users', isLoggedIn, isAdmin, adminController.renderUsers);
 
@@ -23,6 +24,7 @@ router.get('/users/:id/edit', isLoggedIn, isAdmin, adminController.renderEditUse
 router.put('/users/:id', isLoggedIn, isAdmin, adminController.updateUser);
 
 // --- QUẢN LÝ QUÁN ĂN ---
+router.get('/campgrounds/export', isLoggedIn, isModOrAdmin, adminController.exportCampgrounds);
 // 1. Xem danh sách
 router.get('/campgrounds', isLoggedIn, isModOrAdmin, adminController.renderCampgrounds);
 
@@ -37,6 +39,7 @@ router.patch('/campgrounds/bulk', isLoggedIn, isModOrAdmin, adminController.bulk
 
 
 // --- QUẢN LÝ ĐÁNH GIÁ ---
+router.get('/reviews/export', isLoggedIn, isModOrAdmin, adminController.exportReviews);
 // 1. Xem danh sách
 router.get('/reviews', isLoggedIn, isModOrAdmin, adminController.renderReviews);
 

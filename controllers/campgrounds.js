@@ -19,9 +19,11 @@ module.exports.index = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // 2. Xử lý Tìm kiếm & Bộ lọc
-    const { search } = req.query;
+    let { search, lat, lng, distance, sort } = req.query;
+    if (lat) lat = lat.replace('_', '.');
+    if (lng) lng = lng.replace('_', '.');
     
-    // --- SỬA Ở ĐÂY: Mặc định chỉ lấy bài 'approved' ---
+    // --- Mặc định chỉ lấy bài 'approved' ---
     let dbQuery = { status: 'approved' }; 
 
     if (search) {
@@ -37,28 +39,128 @@ module.exports.index = async (req, res) => {
         };
     }
 
-    // 3. Truy vấn Database
-    const campgrounds = await Campground.find(dbQuery)
-        // --- SỬA Ở ĐÂY: Ưu tiên isFeatured (true) lên đầu, sau đó đến bài mới nhất ---
-        .sort({ isFeatured: -1, _id: -1 }) 
+    let parsedLat = parseFloat(lat);
+    let parsedLng = parseFloat(lng);
+    let isValidLocation = !isNaN(parsedLat) && !isNaN(parsedLng) && 
+                          parsedLat >= -90 && parsedLat <= 90 && 
+                          parsedLng >= -180 && parsedLng <= 180;
+
+    if (isValidLocation && distance) {
+        if (!sort || sort === 'nearest') {
+            dbQuery.geometry = {
+                $near: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [parsedLng, parsedLat]
+                    },
+                    $maxDistance: parseInt(distance) * 1000 // meters
+                }
+            };
+        } else {
+            // Dùng $geoWithin để cho phép custom sort (bởi vì $near bắt buộc sort theo khoảng cách)
+            dbQuery.geometry = {
+                $geoWithin: {
+                    $centerSphere: [ [parsedLng, parsedLat], parseInt(distance) / 6378.1 ] // distance in km / earth radius in km
+                }
+            };
+        }
+    }
+
+    let sortObj = { isFeatured: -1, createdAt: -1 };
+    if (isValidLocation && distance) {
+        if (!sort || sort === 'nearest') {
+            sortObj = {}; // $near automatically sorts by distance
+        } else if (sort === 'hot') {
+            sortObj = { views: -1 };
+        } else if (sort === 'best') {
+            // "properties.avgRating" requires proper mapping, fallback to no sort on DB then JS sort
+            sortObj = {}; 
+        }
+    }
+
+    let campgrounds = await Campground.find(dbQuery)
+        .populate('reviews')
+        .sort(sortObj) 
         .skip(skip)
         .limit(limit);
 
+    // Tính toán rating và các trường khác
+    let processedCampgrounds = [];
+    for (let camp of campgrounds) {
+        let obj = camp.toObject({ virtuals: true });
+        if (camp.reviews && camp.reviews.length > 0) {
+            let totalRating = 0;
+            let positiveCount = 0;
+            for (let r of camp.reviews) {
+                if (r.rating) totalRating += r.rating;
+                if (r.sentiment === 'positive') positiveCount++;
+            }
+            obj.avgRating = totalRating / camp.reviews.length;
+            obj.reviewCount = camp.reviews.length;
+            obj.positiveRatio = Math.round((positiveCount / camp.reviews.length) * 100);
+        } else {
+            obj.avgRating = 0;
+            obj.reviewCount = 0;
+        }
+        
+        // Tính khoảng cách nếu có lat/lng hợp lệ
+        if (isValidLocation) {
+            // Simplified straight line distance calculation for UI (Haversine formula is better but let's use a rough approx if needed, or rely on $near)
+            // Just returning the calculated dist wasn't directly possible with standard .find() so we skip exact dist display or use a simple calc
+            // But we will pass it anyway
+            const campLat = obj.geometry.coordinates[1];
+            const campLng = obj.geometry.coordinates[0];
+            const R = 6371e3; // metres
+            const φ1 = parsedLat * Math.PI/180;
+            const φ2 = campLat * Math.PI/180;
+            const Δφ = (campLat-parsedLat) * Math.PI/180;
+            const Δλ = (campLng-parsedLng) * Math.PI/180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            const d = R * c; // in metres
+            obj.dist = { calculated: d };
+        }
+        
+        processedCampgrounds.push(obj);
+    }
+    
+    // Sắp xếp lại sau khi tính toán nếu cần (ví dụ: best)
+    if (isValidLocation && distance && sort === 'best') {
+        processedCampgrounds.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
+    }
+
     // 4. Đếm tổng số bài (để làm phân trang)
-    const totalDocs = await Campground.countDocuments(dbQuery);
+    // $near không dùng được với countDocuments, nên ta chuyển qua $geoWithin để đếm
+    let countQuery = { ...dbQuery };
+    if (isValidLocation && distance) {
+        countQuery.geometry = {
+            $geoWithin: {
+                $centerSphere: [ [parsedLng, parsedLat], parseInt(distance) / 6378.1 ]
+            }
+        };
+    }
+    const totalDocs = await Campground.countDocuments(countQuery);
     const totalPages = Math.ceil(totalDocs / limit);
 
-    // 5. Lấy dữ liệu cho bản đồ (Cũng phải tuân thủ dbQuery để không lộ bài chưa duyệt)
-    const allCampgroundsForMap = await Campground.find(dbQuery, 'geometry title location description')
-                                                 .sort({ isFeatured: -1, _id: -1 });
+    // 5. Lấy dữ liệu cho bản đồ
+    let mapQuery = { ...countQuery }; // map cũng không nên dùng $near nếu không thực sự cần limit/sort
+    const allCampgroundsForMap = await Campground.find(mapQuery, 'geometry title location description')
+                                                 .sort(sortObj);
 
     // 6. Trả về giao diện
     res.render('campgrounds/index', { 
-        campgrounds, 
+        campgrounds: processedCampgrounds, 
         currentPage: page, 
         totalPages, 
         allCampgroundsForMap,
-        search 
+        search,
+        lat,
+        lng,
+        sortMode: sort || 'nearest'
     });
 };
 
@@ -82,7 +184,7 @@ module.exports.createCampground = async (req, res, next) => {
   campground.author = req.user._id;
   await campground.save();
 
-  req.flash("success", "Successfully made a new campground!");
+  req.flash("success", "Đã tạo quán ăn mới thành công!");
   res.redirect(`/campgrounds/${campground._id}`);
 };
 
@@ -97,6 +199,10 @@ module.exports.showCampground = async (req, res) => {
         req.flash('error', 'Không tìm thấy quán ăn!');
         return res.redirect('/campgrounds');
     }
+
+    // Tăng lượt xem
+    await Campground.updateOne({ _id: req.params.id }, { $inc: { views: 1 } });
+    campground.views += 1;
 
     // --- TÍNH TOÁN THỐNG KÊ AI ---
     let totalReviews = campground.reviews.length;
@@ -124,7 +230,7 @@ module.exports.renderEditForm = async (req, res) => {
   const { id } = req.params;
   const campground = await Campground.findById(id);
   if (!campground) {
-    req.flash("error", "Campground not found!");
+    req.flash("error", "Không tìm thấy quán ăn!");
     return res.redirect("/campgrounds");
   }
   res.render("campgrounds/edit", { campground });
@@ -150,7 +256,7 @@ module.exports.updateCampground = async (req, res) => {
       $pull: { images: { filename: { $in: req.body.deleteImages } } },
     });
   }
-  req.flash("success", "Successfully updated campground!");
+  req.flash("success", "Đã cập nhật thông tin quán ăn thành công!");
   res.redirect(`/campgrounds/${campground._id}`);
 };
 module.exports.deleteCampground = async (req, res) => {
@@ -159,7 +265,7 @@ module.exports.deleteCampground = async (req, res) => {
     // SỬA THÀNH: Tìm theo ID và xóa luôn (bất kể ai là tác giả)
     await Campground.findByIdAndDelete(id);
     
-    req.flash('success', 'Successfully deleted campground');
+    req.flash('success', 'Đã xóa quán ăn thành công!');
     res.redirect('/campgrounds');
 }
 
@@ -183,74 +289,4 @@ module.exports.toggleFavorite = async (req, res) => {
     res.redirect(req.get('Referrer') || '/campgrounds');
 };
 
-module.exports.seedNearby = async (req, res) => {
-    const { lat, lng } = req.body;
-    if (!lat || !lng) {
-        req.flash('error', 'Không tìm thấy tọa độ của bạn!');
-        return res.redirect('/campgrounds');
-    }
 
-    let user = await User.findOne({ role: 'admin' });
-    if (!user) user = await User.findOne();
-    
-    if (!user) {
-        req.flash('error', 'Không tìm thấy user để gán quyền tác giả!');
-        return res.redirect('/campgrounds');
-    }
-
-    const Review = require('../models/reviews');
-
-    const sampleImages = [
-        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
-        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1000&q=80",
-        "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1000&q=80",
-        "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=80"
-    ];
-    const adjectives = ["Ngon", "Tuyệt Đỉnh", "Bình Dân", "Sang Trọng"];
-    const nouns = ["Phở", "Bún", "Lẩu", "Nướng BBQ", "Cà Phê"];
-    const sample = array => array[Math.floor(Math.random() * array.length)];
-    
-    const baseLat = parseFloat(lat);
-    const baseLng = parseFloat(lng);
-
-    for (let i = 0; i < 20; i++) {
-        // Tạo tọa độ ngẫu nhiên xung quanh điểm gốc (khoảng 10-30km)
-        const latOffset = (Math.random() - 0.5) * 0.4;
-        const lngOffset = (Math.random() - 0.5) * 0.4;
-        
-        const camp = new Campground({
-            author: user._id,
-            title: `[GẦN ĐÂY] ${sample(nouns)} ${sample(adjectives)} ${i+1}`,
-            location: "Gần Vị Trí Của Bạn",
-            description: "Một quán ăn ngon được tạo tự động gần vị trí của bạn.",
-            price: Math.floor(Math.random() * 200000) + 30000,
-            category: sample(["Phở", "Bún", "Lẩu", "Nướng"]),
-            geometry: {
-                type: "Point",
-                coordinates: [baseLng + lngOffset, baseLat + latOffset]
-            },
-            images: [
-                { url: sample(sampleImages), filename: `Nearby_1_${i}` },
-                { url: sample(sampleImages), filename: `Nearby_2_${i}` }
-            ],
-            status: 'approved'
-        });
-
-        for (let j = 0; j < 3; j++) {
-            const review = new Review({
-                rating: Math.floor(Math.random() * 3) + 3,
-                body: "Rất ngon và đáng thử!",
-                sentiment: "positive",
-                author: user._id,
-                isToxic: false
-            });
-            await review.save();
-            camp.reviews.push(review);
-        }
-
-        await camp.save();
-    }
-
-    req.flash('success', 'Đã thêm 20 quán ăn gần vị trí của bạn!');
-    res.redirect(`/campgrounds?lat=${baseLat}&lng=${baseLng}&distance=50`);
-};

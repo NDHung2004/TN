@@ -17,7 +17,7 @@ module.exports.createReview = async (req, res) => {
     } else {
         req.flash('success', 'Đã thêm đánh giá thành công!');
     }
-  req.flash("success", "Created new review!");
+  // Duplicate flash msg removed
   res.redirect(`/campgrounds/${campground._id}`);
 };
 
@@ -27,6 +27,6 @@ module.exports.deleteReview = async (req, res) => {
     $pull: { reviews: reviewId },
   });
   await Review.findByIdAndDelete(reviewId);
-  req.flash("success", "Successfully deleted review!");
+  req.flash("success", "Đã xóa đánh giá thành công!");
   res.redirect(`/campgrounds/${id}`);
 };

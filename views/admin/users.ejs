@@ -10,6 +10,9 @@
     <div class="flex-1 p-6 md:p-10 max-w-7xl mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight" data-aos="fade-right">Quản lý Người Dùng</h1>
+            <button type="button" id="btnExportExcel" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl shadow-sm transition-colors" data-aos="fade-left">
+                <i class="fas fa-file-excel mr-2"></i> Xuất Excel
+            </button>
         </div>
 
         <div class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800" data-aos="fade-up" data-aos-delay="0">
@@ -192,5 +195,70 @@
             <% } %>
 
         </div>
+        <!-- Thêm đoạn script xuất Excel vào cuối -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.getElementById('btnExportExcel').addEventListener('click', () => {
+                Swal.fire({
+                    title: 'Tùy chọn Xuất Excel',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 dark:bg-gray-900',
+                        title: 'text-2xl font-extrabold text-gray-900 dark:text-white pt-4',
+                        confirmButton: 'px-6 py-2.5 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-sm',
+                        cancelButton: 'px-6 py-2.5 bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ml-3'
+                    },
+                    buttonsStyling: false,
+                    html: `
+                        <div class="text-left mt-4 px-2">
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Vai trò</label>
+                            <select id="swal-role" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none mb-5 transition-colors">
+                                <option value="all">Tất cả</option>
+                                <option value="admin">Quản trị viên</option>
+                                <option value="moderator">Kiểm duyệt viên</option>
+                                <option value="user">Người dùng</option>
+                            </select>
+                            
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Trạng thái</label>
+                            <select id="swal-status" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none mb-5 transition-colors">
+                                <option value="all">Tất cả</option>
+                                <option value="active">Đang hoạt động</option>
+                                <option value="banned">Bị khóa</option>
+                            </select>
+
+                            <div class="flex gap-4">
+                                <div class="w-1/2">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Từ trang</label>
+                                    <input id="swal-page-from" type="number" min="1" value="1" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors" placeholder="1">
+                                </div>
+                                <div class="w-1/2">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Đến trang</label>
+                                    <input id="swal-page-to" type="number" min="1" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors" placeholder="Tất cả">
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="fas fa-file-download mr-1"></i> Tải xuống',
+                    cancelButtonText: 'Hủy',
+                    preConfirm: () => {
+                        return {
+                            role: document.getElementById('swal-role').value,
+                            status: document.getElementById('swal-status').value,
+                            pageFrom: document.getElementById('swal-page-from').value,
+                            pageTo: document.getElementById('swal-page-to').value
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const v = result.value;
+                        let url = '/admin/users/export?role=' + v.role + '&status=' + v.status;
+                        if(v.pageFrom) url += '&pageFrom=' + v.pageFrom;
+                        if(v.pageTo) url += '&pageTo=' + v.pageTo;
+                        window.location.href = url;
+                    }
+                });
+            });
+        </script>
     </div>
 </div>

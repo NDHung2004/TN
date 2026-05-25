@@ -8,8 +8,6 @@ const multer = require("multer");
 const { storage } = require("../cloudinary/index.js");
 const upload = multer({ storage });
 
-router.post('/seed-nearby', catchAsync(campgrounds.seedNearby));
-
 router.post('/:id/favorite', isLoggedIn, campgrounds.toggleFavorite);
 router
   .route("/")
