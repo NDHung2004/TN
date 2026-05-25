@@ -14,7 +14,7 @@
         </div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Bạn chưa yêu thích quán nào</h3>
         <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Hãy khám phá thêm những địa điểm ẩm thực hấp dẫn và thêm vào danh sách yêu thích nhé.</p>
-        <a href="/campgrounds" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 shadow-md transition-all duration-300">
+        <a href="/restaurants" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 shadow-md transition-all duration-300">
             <i class="fas fa-search mr-2"></i> Khám phá ngay
         </a>
     </div>
@@ -31,7 +31,7 @@
                         <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop" alt="Vietnamese food" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     <% } %>
                     <!-- Heart Badge overlay -->
-                    <form action="/campgrounds/<%= camp._id %>/favorite" method="POST" class="absolute top-3 right-3">
+                    <form action="/restaurants/<%= camp._id %>/favorite" method="POST" class="absolute top-3 right-3">
                         <button type="submit" class="w-10 h-10 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm text-rose-500 shadow-sm flex items-center justify-center hover:scale-110 transition-transform">
                             <i class="fas fa-heart text-lg"></i>
                         </button>
@@ -48,7 +48,7 @@
                     </p>
                     
                     <div class="mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
-                        <a href="/campgrounds/<%= camp._id %>" class="block w-full py-2.5 px-4 text-center text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
+                        <a href="/restaurants/<%= camp._id %>" class="block w-full py-2.5 px-4 text-center text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
                             Xem chi tiết
                         </a>
                     </div>

@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <!-- Total Campgrounds -->
+            <!-- Total Restaurants -->
             <div class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 p-5">
                 <p class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Quán ăn</p>
                 <div class="flex items-end justify-between">
@@ -135,7 +135,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <!-- 5. Top Campgrounds -->
+            <!-- 5. Top Restaurants -->
             <div class="bg-white dark:bg-dark-card rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col">
                 <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
                     <h6 class="font-bold text-gray-800 dark:text-gray-200"><i class="fas fa-trophy mr-2 text-yellow-500"></i> Top Địa điểm Nổi bật</h6>
@@ -150,13 +150,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% topCampgrounds.forEach((camp, idx) => { %>
+                            <% topRestaurants.forEach((camp, idx) => { %>
                                 <tr class="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
                                     <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white flex items-center gap-3">
                                         <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold <%= idx === 0 ? 'bg-yellow-100 text-yellow-600' : idx === 1 ? 'bg-gray-200 text-gray-600' : idx === 2 ? 'bg-amber-100 text-amber-700' : 'bg-primary-50 text-primary-600' %>">
                                             <%= idx + 1 %>
                                         </span>
-                                        <a href="/campgrounds/<%= camp._id %>" target="_blank" class="hover:text-primary-500"><%= camp.title %></a>
+                                        <a href="/restaurants/<%= camp._id %>" target="_blank" class="hover:text-primary-500"><%= camp.title %></a>
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded dark:bg-blue-900 dark:text-blue-300">

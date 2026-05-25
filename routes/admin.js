@@ -24,18 +24,18 @@ router.get('/users/:id/edit', isLoggedIn, isAdmin, adminController.renderEditUse
 router.put('/users/:id', isLoggedIn, isAdmin, adminController.updateUser);
 
 // --- QUẢN LÝ QUÁN ĂN ---
-router.get('/campgrounds/export', isLoggedIn, isModOrAdmin, adminController.exportCampgrounds);
+router.get('/restaurants/export', isLoggedIn, isModOrAdmin, adminController.exportRestaurants);
 // 1. Xem danh sách
-router.get('/campgrounds', isLoggedIn, isModOrAdmin, adminController.renderCampgrounds);
+router.get('/restaurants', isLoggedIn, isModOrAdmin, adminController.renderRestaurants);
 
 // 2. Chuyển trạng thái (Duyệt/Từ chối)
-router.patch('/campgrounds/:id/status', isLoggedIn, isModOrAdmin, adminController.updateCampgroundStatus);
+router.patch('/restaurants/:id/status', isLoggedIn, isModOrAdmin, adminController.updateRestaurantStatus);
 // 3. Ghim bài
-router.patch('/campgrounds/:id/featured', isLoggedIn, isAdmin, adminController.toggleFeatured);
+router.patch('/restaurants/:id/featured', isLoggedIn, isAdmin, adminController.toggleFeatured);
 // 4. Xóa bài
-router.delete('/campgrounds/:id', isLoggedIn, isModOrAdmin, adminController.deleteCampgroundAdmin);
+router.delete('/restaurants/:id', isLoggedIn, isModOrAdmin, adminController.deleteRestaurantAdmin);
 // 5. Bulk actions (Duyệt nhiều, từ chối nhiều, xóa nhiều)
-router.patch('/campgrounds/bulk', isLoggedIn, isModOrAdmin, adminController.bulkCampgroundsAction);
+router.patch('/restaurants/bulk', isLoggedIn, isModOrAdmin, adminController.bulkRestaurantsAction);
 
 
 // --- QUẢN LÝ ĐÁNH GIÁ ---

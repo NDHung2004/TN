@@ -17,12 +17,12 @@ map.on("load", () => {
   // Add a new source from our GeoJSON data and
   // set the 'cluster' option to true. GL-JS will
   // add the point_count property to your source data.
-  map.addSource("campgrounds", {
+  map.addSource("restaurants", {
     type: "geojson",
     generateId: true,
     // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
     // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
-    data: campgrounds,
+    data: restaurants,
     cluster: true,
     clusterMaxZoom: 14, // Max zoom to cluster points on
     clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
@@ -31,7 +31,7 @@ map.on("load", () => {
   map.addLayer({
     id: "clusters",
     type: "circle",
-    source: "campgrounds",
+    source: "restaurants",
     filter: ["has", "point_count"],
     paint: {
       // Use step expressions (https://docs.mapbox.com/style-spec/reference/expressions/#step)
@@ -56,7 +56,7 @@ map.on("load", () => {
   map.addLayer({
     id: "cluster-count",
     type: "symbol",
-    source: "campgrounds",
+    source: "restaurants",
     filter: ["has", "point_count"],
     layout: {
       "text-field": ["get", "point_count_abbreviated"],
@@ -68,7 +68,7 @@ map.on("load", () => {
   map.addLayer({
     id: "unclustered-point",
     type: "circle",
-    source: "campgrounds",
+    source: "restaurants",
     filter: ["!", ["has", "point_count"]],
     paint: {
       "circle-color": "#11b4da",
@@ -92,7 +92,7 @@ map.on("load", () => {
       });
       const clusterId = features[0].properties.cluster_id;
       map
-        .getSource("campgrounds")
+        .getSource("restaurants")
         .getClusterExpansionZoom(clusterId, (err, zoom) => {
           if (err) return;
 
@@ -158,12 +158,12 @@ map.on("load", () => {
     },
   });
 });
-if (campgrounds.features.length > 0 || (typeof userLat !== 'undefined' && userLat !== null && typeof userLng !== 'undefined' && userLng !== null)) {
+if (restaurants.features.length > 0 || (typeof userLat !== 'undefined' && userLat !== null && typeof userLng !== 'undefined' && userLng !== null)) {
     const bounds = new mapboxgl.LngLatBounds();
 
     // Duyệt qua tất cả các quán ăn trong kết quả tìm kiếm để lấy tọa độ
-    if (campgrounds.features && campgrounds.features.length > 0) {
-        campgrounds.features.forEach(function (feature) {
+    if (restaurants.features && restaurants.features.length > 0) {
+        restaurants.features.forEach(function (feature) {
             bounds.extend(feature.geometry.coordinates);
         });
     }

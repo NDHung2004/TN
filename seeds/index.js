@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Campground = require("../models/campground");
+const Restaurant = require("../models/restaurant");
 const restaurants = require("./restaurantData");
 
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
@@ -11,10 +11,10 @@ db.once("open", () => {
 });
 
 const seedDB = async () => {
-  await Campground.deleteMany({});
+  await Restaurant.deleteMany({});
 
   for (let r of restaurants) {
-    const camp = new Campground({
+    const camp = new Restaurant({
       author: "697f5efd477a4ddebe10d25e",
 
       title: r.title,

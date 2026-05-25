@@ -9,7 +9,7 @@ cloudinary.v2.config({
 
 const storage = cloudinaryStorage({
   cloudinary, // library expects root object (has .v2)
-  folder: "YelpCamp",
+  folder: "QuanAn",
   allowedFormats: ["jpeg", "png", "jpg"],
 });
 

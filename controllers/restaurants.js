@@ -1,4 +1,4 @@
-const Campground = require("../models/campground");
+const Restaurant = require("../models/restaurant");
 const User = require('../models/users');
 const mbxGeocode = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapboxToken = process.env.MAPBOX_TOKEN;
@@ -78,15 +78,15 @@ module.exports.index = async (req, res) => {
         }
     }
 
-    let campgrounds = await Campground.find(dbQuery)
+    let restaurants = await Restaurant.find(dbQuery)
         .populate('reviews')
         .sort(sortObj) 
         .skip(skip)
         .limit(limit);
 
     // Tính toán rating và các trường khác
-    let processedCampgrounds = [];
-    for (let camp of campgrounds) {
+    let processedRestaurants = [];
+    for (let camp of restaurants) {
         let obj = camp.toObject({ virtuals: true });
         if (camp.reviews && camp.reviews.length > 0) {
             let totalRating = 0;
@@ -125,12 +125,12 @@ module.exports.index = async (req, res) => {
             obj.dist = { calculated: d };
         }
         
-        processedCampgrounds.push(obj);
+        processedRestaurants.push(obj);
     }
     
     // Sắp xếp lại sau khi tính toán nếu cần (ví dụ: best)
     if (isValidLocation && distance && sort === 'best') {
-        processedCampgrounds.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
+        processedRestaurants.sort((a, b) => (b.avgRating || 0) - (a.avgRating || 0));
     }
 
     // 4. Đếm tổng số bài (để làm phân trang)
@@ -143,20 +143,20 @@ module.exports.index = async (req, res) => {
             }
         };
     }
-    const totalDocs = await Campground.countDocuments(countQuery);
+    const totalDocs = await Restaurant.countDocuments(countQuery);
     const totalPages = Math.ceil(totalDocs / limit);
 
     // 5. Lấy dữ liệu cho bản đồ
     let mapQuery = { ...countQuery }; // map cũng không nên dùng $near nếu không thực sự cần limit/sort
-    const allCampgroundsForMap = await Campground.find(mapQuery, 'geometry title location description')
+    const allRestaurantsForMap = await Restaurant.find(mapQuery, 'geometry title location description')
                                                  .sort(sortObj);
 
     // 6. Trả về giao diện
-    res.render('campgrounds/index', { 
-        campgrounds: processedCampgrounds, 
+    res.render('restaurants/index', { 
+        restaurants: processedRestaurants, 
         currentPage: page, 
         totalPages, 
-        allCampgroundsForMap,
+        allRestaurantsForMap,
         search,
         lat,
         lng,
@@ -166,50 +166,50 @@ module.exports.index = async (req, res) => {
 
 module.exports.renderNewForm = async (req, res) => {
     const categories = await Category.find({});
-    res.render('campgrounds/new', { categories });
+    res.render('restaurants/new', { categories });
 }
 
-module.exports.createCampground = async (req, res, next) => {
+module.exports.createRestaurant = async (req, res, next) => {
   const geoData = await geocoder
-    .forwardGeocode({ query: req.body.campground.location, limit: 1 })
+    .forwardGeocode({ query: req.body.restaurant.location, limit: 1 })
     .send();
-  const campground = new Campground(req.body.campground);
-  campground.geometry = geoData.body.features[0].geometry;
+  const restaurant = new Restaurant(req.body.restaurant);
+  restaurant.geometry = geoData.body.features[0].geometry;
   console.log(req.files);
-  campground.images = req.files.map((f) => ({
+  restaurant.images = req.files.map((f) => ({
     url: f.secure_url,
     filename: f.public_id,
   }));
 
-  campground.author = req.user._id;
-  await campground.save();
+  restaurant.author = req.user._id;
+  await restaurant.save();
 
   req.flash("success", "Đã tạo quán ăn mới thành công!");
-  res.redirect(`/campgrounds/${campground._id}`);
+  res.redirect(`/restaurants/${restaurant._id}`);
 };
 
-module.exports.showCampground = async (req, res) => {
+module.exports.showRestaurant = async (req, res) => {
     // Tìm quán ăn và lấy danh sách review
-    const campground = await Campground.findById(req.params.id).populate({
+    const restaurant = await Restaurant.findById(req.params.id).populate({
         path: 'reviews',
         populate: { path: 'author' }
     }).populate('author');
 
-    if (!campground) {
+    if (!restaurant) {
         req.flash('error', 'Không tìm thấy quán ăn!');
-        return res.redirect('/campgrounds');
+        return res.redirect('/restaurants');
     }
 
     // Tăng lượt xem
-    await Campground.updateOne({ _id: req.params.id }, { $inc: { views: 1 } });
-    campground.views += 1;
+    await Restaurant.updateOne({ _id: req.params.id }, { $inc: { views: 1 } });
+    restaurant.views += 1;
 
     // --- TÍNH TOÁN THỐNG KÊ AI ---
-    let totalReviews = campground.reviews.length;
+    let totalReviews = restaurant.reviews.length;
     let positiveCount = 0;
     let negativeCount = 0;
 
-    for (let r of campground.reviews) {
+    for (let r of restaurant.reviews) {
         if (r.sentiment === 'positive') positiveCount++;
         else if (r.sentiment === 'negative') negativeCount++;
     }
@@ -223,50 +223,50 @@ module.exports.showCampground = async (req, res) => {
     // ----------------------------
 
     // Truyền thêm aiStats vào view
-    res.render('campgrounds/show', { campground, aiStats });
+    res.render('restaurants/show', { restaurant, aiStats });
 }
 
 module.exports.renderEditForm = async (req, res) => {
   const { id } = req.params;
-  const campground = await Campground.findById(id);
-  if (!campground) {
+  const restaurant = await Restaurant.findById(id);
+  if (!restaurant) {
     req.flash("error", "Không tìm thấy quán ăn!");
-    return res.redirect("/campgrounds");
+    return res.redirect("/restaurants");
   }
-  res.render("campgrounds/edit", { campground });
+  res.render("restaurants/edit", { restaurant });
 };
 
-module.exports.updateCampground = async (req, res) => {
+module.exports.updateRestaurant = async (req, res) => {
   const { id } = req.params;
-  const campground = await Campground.findByIdAndUpdate(id, {
-    ...req.body.campground,
+  const restaurant = await Restaurant.findByIdAndUpdate(id, {
+    ...req.body.restaurant,
   });
   const imgs = req.files.map((f) => ({
     url: f.secure_url,
     filename: f.public_id,
   }));
-  campground.images.push(...imgs);
-  await campground.save();
+  restaurant.images.push(...imgs);
+  await restaurant.save();
 
   if (req.body.deleteImages) {
     for (let filename of req.body.deleteImages) {
       await cloudinary.uploader.destroy(filename);
     }
-    await campground.updateOne({
+    await restaurant.updateOne({
       $pull: { images: { filename: { $in: req.body.deleteImages } } },
     });
   }
   req.flash("success", "Đã cập nhật thông tin quán ăn thành công!");
-  res.redirect(`/campgrounds/${campground._id}`);
+  res.redirect(`/restaurants/${restaurant._id}`);
 };
-module.exports.deleteCampground = async (req, res) => {
+module.exports.deleteRestaurant = async (req, res) => {
     const { id } = req.params;
     
     // SỬA THÀNH: Tìm theo ID và xóa luôn (bất kể ai là tác giả)
-    await Campground.findByIdAndDelete(id);
+    await Restaurant.findByIdAndDelete(id);
     
     req.flash('success', 'Đã xóa quán ăn thành công!');
-    res.redirect('/campgrounds');
+    res.redirect('/restaurants');
 }
 
 module.exports.toggleFavorite = async (req, res) => {
@@ -286,7 +286,7 @@ module.exports.toggleFavorite = async (req, res) => {
         });
         req.flash('success', 'Đã thêm vào danh sách yêu thích!');
     }
-    res.redirect(req.get('Referrer') || '/campgrounds');
+    res.redirect(req.get('Referrer') || '/restaurants');
 };
 
 

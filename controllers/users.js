@@ -1,5 +1,5 @@
 const User = require("../models/users");
-const Campground = require('../models/campground');
+const Restaurant = require('../models/restaurant');
 module.exports.renderRegister = (req, res) => {
     res.render('users/register');
 }
@@ -10,7 +10,7 @@ module.exports.renderLogin = (req, res) => {
 
 module.exports.login = (req, res) => {
   req.flash("success", "Chào mừng bạn quay lại!");
-  const redirectUrl = req.session.returnTo || "/campgrounds";
+  const redirectUrl = req.session.returnTo || "/restaurants";
   delete req.session.returnTo;
   res.redirect(redirectUrl);
 };
@@ -21,7 +21,7 @@ module.exports.logout = (req, res, next) => {
       return next(err);
     }
     req.flash("success", "Tạm biệt!");
-    res.redirect("/campgrounds");
+    res.redirect("/restaurants");
   });
 };
 
@@ -36,20 +36,20 @@ module.exports.register = async (req, res, next) => {
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) return next(err);
-            req.flash('success', 'Chào mừng bạn đến với YelpCamp!');
-            res.redirect('/campgrounds');
+            req.flash('success', 'Chào mừng bạn đến với Quán ăn!');
+            res.redirect('/restaurants');
         })
     } catch (e) {
         req.flash('error', e.message);
         res.redirect('register');
     }
 }
-module.exports.renderMyCampgrounds = async (req, res) => {
+module.exports.renderMyRestaurants = async (req, res) => {
   
-    const myCampgrounds = await Campground.find({ author: req.user._id });
+    const myRestaurants = await Restaurant.find({ author: req.user._id });
     
   
-    res.render('users/my-campgrounds', { myCampgrounds });
+    res.render('users/my-restaurants', { myRestaurants });
 };
 module.exports.renderFavorites = async (req, res) => {
     const user = await User.findById(req.user._id).populate('favorites');

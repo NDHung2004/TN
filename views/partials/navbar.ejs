@@ -4,25 +4,31 @@
             <!-- Logo & Brand -->
             <div class="flex-shrink-0 flex items-center">
                 <a href="/" class="flex items-center gap-2 group">
-                    <% if(typeof generalSetting !== 'undefined' && generalSetting.logoUrl) { %>
-                        <img src="<%= generalSetting.logoUrl %>" alt="Logo" class="h-8 w-auto rounded-md group-hover:scale-105 transition-transform duration-300">
-                    <% } else { %>
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all duration-300">
-                            Y
-                        </div>
-                    <% } %>
-                    <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                        <%= (typeof generalSetting !== 'undefined' && generalSetting.siteTitle) ? generalSetting.siteTitle : 'YelpCamp' %>
-                    </span>
+                    <% if(typeof generalSetting !=='undefined' && generalSetting.logoUrl) { %>
+                        <img src="<%= generalSetting.logoUrl %>" alt="Logo"
+                            class="h-8 w-auto rounded-md group-hover:scale-105 transition-transform duration-300">
+                        <% } else { %>
+                            <div
+                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+                                Y
+                            </div>
+                            <% } %>
+                                <span
+                                    class="font-bold text-xl tracking-tight text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                    <%= (typeof generalSetting !=='undefined' && generalSetting.siteTitle) ?
+                                        generalSetting.siteTitle : 'Quán ăn Việt' %>
+                                </span>
                 </a>
             </div>
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex md:items-center md:space-x-8">
-                <a href="/campgrounds" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-2">
+                <a href="/restaurants"
+                    class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-2">
                     <i class="fas fa-compass text-primary-500"></i> Khám phá Quán
                 </a>
-                <button id="navFindNearbyBtn" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-2 focus:outline-none">
+                <button id="navFindNearbyBtn"
+                    class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-2 focus:outline-none">
                     <i class="fas fa-location-arrow text-primary-500"></i> Tìm Quán Ở Gần
                 </button>
             </div>
@@ -30,57 +36,73 @@
             <!-- Desktop Auth / Profile -->
             <div class="hidden md:flex md:items-center md:space-x-4">
                 <!-- Dark mode toggle -->
-                <button id="theme-toggle" class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors focus:outline-none">
+                <button id="theme-toggle"
+                    class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors focus:outline-none">
                     <i class="fas fa-moon hidden dark:block"></i>
                     <i class="fas fa-sun block dark:hidden"></i>
                 </button>
 
                 <% if(!currentUser) { %>
-                    <a href="/login" class="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary-600 transition-colors">Đăng nhập</a>
-                    <a href="/register" class="ml-4 px-4 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-full shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                    <a href="/login"
+                        class="text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary-600 transition-colors">Đăng
+                        nhập</a>
+                    <a href="/register"
+                        class="ml-4 px-4 py-2 text-sm font-medium text-white bg-gray-900 dark:bg-white dark:text-gray-900 rounded-full shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                         Đăng ký
                     </a>
-                <% } else { %>
-                    <% if(currentUser.role === 'admin') { %>
-                        <a href="/admin" class="text-xs font-bold text-amber-600 dark:text-amber-400 border border-amber-600 dark:border-amber-400 px-3 py-1.5 rounded-full hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors flex items-center gap-1">
-                            <i class="fas fa-user-shield"></i> QUẢN TRỊ
-                        </a>
-                    <% } else if(currentUser.role === 'moderator') { %>
-                        <a href="/admin/campgrounds" class="text-xs font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-600 dark:border-cyan-400 px-3 py-1.5 rounded-full hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition-colors flex items-center gap-1">
-                            <i class="fas fa-tasks"></i> DUYỆT BÀI
-                        </a>
-                    <% } %>
+                    <% } else { %>
+                        <% if(currentUser.role==='admin' ) { %>
+                            <a href="/admin"
+                                class="text-xs font-bold text-amber-600 dark:text-amber-400 border border-amber-600 dark:border-amber-400 px-3 py-1.5 rounded-full hover:bg-amber-50 dark:hover:bg-amber-900/30 transition-colors flex items-center gap-1">
+                                <i class="fas fa-user-shield"></i> QUẢN TRỊ
+                            </a>
+                            <% } else if(currentUser.role==='moderator' ) { %>
+                                <a href="/admin/restaurants"
+                                    class="text-xs font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-600 dark:border-cyan-400 px-3 py-1.5 rounded-full hover:bg-cyan-50 dark:hover:bg-cyan-900/30 transition-colors flex items-center gap-1">
+                                    <i class="fas fa-tasks"></i> DUYỆT BÀI
+                                </a>
+                                <% } %>
 
-                    <!-- Profile Dropdown -->
-                    <div class="relative group">
-                        <button class="flex items-center gap-2 focus:outline-none">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-sm font-bold text-gray-700 dark:text-gray-200 shadow-sm border border-white dark:border-gray-600">
-                                <%= currentUser.username[0].toUpperCase() %>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><%= currentUser.username %></span>
-                            <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600 transition-colors"></i>
-                        </button>
+                                    <!-- Profile Dropdown -->
+                                    <div class="relative group">
+                                        <button class="flex items-center gap-2 focus:outline-none">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-sm font-bold text-gray-700 dark:text-gray-200 shadow-sm border border-white dark:border-gray-600">
+                                                <%= currentUser.username[0].toUpperCase() %>
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                                <%= currentUser.username %>
+                                            </span>
+                                            <i
+                                                class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600 transition-colors"></i>
+                                        </button>
 
-                        <!-- Dropdown menu -->
-                        <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
-                            <div class="py-1">
-                                <a href="/campgrounds/new" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                    <i class="fas fa-plus-circle text-primary-500 w-4"></i> Đăng Quán mới
-                                </a>
-                                <a href="/my-restaurants" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                    <i class="fas fa-store text-primary-500 w-4"></i> Quán của tôi
-                                </a>
-                                <a href="/favorites" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                    <i class="fas fa-heart text-rose-500 w-4"></i> Đã thích
-                                </a>
-                                <div class="h-px bg-gray-100 dark:bg-gray-800 my-1"></div>
-                                <a href="/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
-                                    <i class="fas fa-sign-out-alt w-4"></i> Đăng xuất
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                <% } %>
+                                        <!-- Dropdown menu -->
+                                        <div
+                                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
+                                            <div class="py-1">
+                                                <a href="/restaurants/new"
+                                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                    <i class="fas fa-plus-circle text-primary-500 w-4"></i> Đăng Quán
+                                                    mới
+                                                </a>
+                                                <a href="/my-restaurants"
+                                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                    <i class="fas fa-store text-primary-500 w-4"></i> Quán của tôi
+                                                </a>
+                                                <a href="/favorites"
+                                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                    <i class="fas fa-heart text-rose-500 w-4"></i> Đã thích
+                                                </a>
+                                                <div class="h-px bg-gray-100 dark:bg-gray-800 my-1"></div>
+                                                <a href="/logout"
+                                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                                                    <i class="fas fa-sign-out-alt w-4"></i> Đăng xuất
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% } %>
             </div>
 
             <!-- Mobile menu button -->
@@ -89,7 +111,8 @@
                     <i class="fas fa-moon hidden dark:block"></i>
                     <i class="fas fa-sun block dark:hidden"></i>
                 </button>
-                <button type="button" id="mobile-menu-btn" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
+                <button type="button" id="mobile-menu-btn"
+                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
@@ -97,35 +120,55 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div class="md:hidden hidden bg-white dark:bg-dark-bg border-b border-gray-100 dark:border-gray-800" id="mobile-menu">
+    <div class="md:hidden hidden bg-white dark:bg-dark-bg border-b border-gray-100 dark:border-gray-800"
+        id="mobile-menu">
         <div class="px-2 pt-2 pb-3 space-y-1">
-            <a href="/campgrounds" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"><i class="fas fa-compass text-primary-500 mr-2 w-5"></i> Khám phá Quán</a>
-            <button id="navFindNearbyBtnMobile" class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"><i class="fas fa-location-arrow text-primary-500 mr-2 w-5"></i> Tìm Quán Ở Gần</button>
-            
+            <a href="/restaurants"
+                class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"><i
+                    class="fas fa-compass text-primary-500 mr-2 w-5"></i> Khám phá Quán</a>
+            <button id="navFindNearbyBtnMobile"
+                class="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"><i
+                    class="fas fa-location-arrow text-primary-500 mr-2 w-5"></i> Tìm Quán Ở Gần</button>
+
             <div class="h-px bg-gray-100 dark:bg-gray-800 my-2"></div>
-            
+
             <% if(!currentUser) { %>
-                <a href="/login" class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800">Đăng nhập</a>
-                <a href="/register" class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">Đăng ký</a>
-            <% } else { %>
-                <div class="px-3 py-2 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold">
-                        <%= currentUser.username[0].toUpperCase() %>
+                <a href="/login"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800">Đăng
+                    nhập</a>
+                <a href="/register"
+                    class="block px-3 py-2 rounded-md text-base font-medium text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800">Đăng
+                    ký</a>
+                <% } else { %>
+                    <div class="px-3 py-2 flex items-center gap-3">
+                        <div
+                            class="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-700 dark:text-primary-300 font-bold">
+                            <%= currentUser.username[0].toUpperCase() %>
+                        </div>
+                        <span class="text-base font-medium text-gray-900 dark:text-white">
+                            <%= currentUser.username %>
+                        </span>
                     </div>
-                    <span class="text-base font-medium text-gray-900 dark:text-white"><%= currentUser.username %></span>
-                </div>
-                <a href="/campgrounds/new" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Đăng Quán mới</a>
-                <a href="/my-restaurants" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Quán của tôi</a>
-                <a href="/favorites" class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Đã thích</a>
-                <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">Đăng xuất</a>
-            <% } %>
+                    <a href="/restaurants/new"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Đăng
+                        Quán mới</a>
+                    <a href="/my-restaurants"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Quán
+                        của tôi</a>
+                    <a href="/favorites"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Đã
+                        thích</a>
+                    <a href="/logout"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">Đăng
+                        xuất</a>
+                    <% } %>
         </div>
     </div>
 </nav>
 
 <script>
     // Mobile menu toggle
-    document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+    document.getElementById('mobile-menu-btn').addEventListener('click', function () {
         document.getElementById('mobile-menu').classList.toggle('hidden');
     });
 
@@ -143,8 +186,8 @@
         }
     }
 
-    if(themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
-    if(themeToggleMobileBtn) themeToggleMobileBtn.addEventListener('click', toggleTheme);
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+    if (themeToggleMobileBtn) themeToggleMobileBtn.addEventListener('click', toggleTheme);
 
     // Find Nearby Logic
     function handleFindNearby(e) {
@@ -158,7 +201,7 @@
                 (position) => {
                     const lat = position.coords.latitude.toString().replace('.', '_');
                     const lng = position.coords.longitude.toString().replace('.', '_');
-                    window.location.href = `/campgrounds?lat=${lat}&lng=${lng}&distance=50`;
+                    window.location.href = `/restaurants?lat=${lat}&lng=${lng}&distance=50`;
                 },
                 (error) => {
                     alert('Không thể lấy vị trí của bạn. Vui lòng cấp quyền vị trí cho trình duyệt.');

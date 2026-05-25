@@ -18,7 +18,7 @@ router
     }),
     users.login
   );
-router.get('/my-restaurants', isLoggedIn, users.renderMyCampgrounds);
+router.get('/my-restaurants', isLoggedIn, users.renderMyRestaurants);
 router.get("/logout", users.logout);
 router.get('/favorites', isLoggedIn, users.renderFavorites);
 module.exports = router;

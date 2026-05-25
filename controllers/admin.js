@@ -1,11 +1,11 @@
 const User = require('../models/users');
-const Campground = require('../models/campground');
+const Restaurant = require('../models/restaurant');
 const Review = require('../models/reviews');
 const Category = require('../models/category');
 const GeneralSetting = require('../models/generalSetting');
 const { cloudinary } = require("../cloudinary/index.js"); 
 const ExcelJS = require('exceljs'); 
-module.exports.renderCampgrounds = async (req, res) => {
+module.exports.renderRestaurants = async (req, res) => {
     const { filter, search } = req.query;
     const page = parseInt(req.query.page) || 1;
     const limit = 10; // Số bài mỗi trang
@@ -26,18 +26,18 @@ module.exports.renderCampgrounds = async (req, res) => {
         ];
     }
 
-    const totalCampgrounds = await Campground.countDocuments(query);
-    const totalPages = Math.ceil(totalCampgrounds / limit);
+    const totalRestaurants = await Restaurant.countDocuments(query);
+    const totalPages = Math.ceil(totalRestaurants / limit);
 
-    const campgrounds = await Campground.find(query)
+    const restaurants = await Restaurant.find(query)
         .populate('author')
         .sort({ createdAt: -1 }) // Bài mới nhất lên đầu (cho tất cả và đã duyệt)
         .skip(skip)
         .limit(limit);
 
-    res.render('admin/campgrounds', { 
-        campgrounds, 
-        active: 'campgrounds', 
+    res.render('admin/restaurants', { 
+        restaurants, 
+        active: 'restaurants', 
         filter,
         search,
         currentPage: page,
@@ -45,67 +45,67 @@ module.exports.renderCampgrounds = async (req, res) => {
     });
 };
 // 2. Duyệt / Từ chối bài (Approval)
-module.exports.updateCampgroundStatus = async (req, res) => {
+module.exports.updateRestaurantStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body; 
 
     // Cập nhật
-    await Campground.findByIdAndUpdate(id, { status: status });
+    await Restaurant.findByIdAndUpdate(id, { status: status });
     
     // BẮT BUỘC: Phải redirect để trang web tải lại và hiện trạng thái mới
     req.flash('success', 'Đã cập nhật trạng thái!');
-    res.redirect('/admin/campgrounds');
+    res.redirect('/admin/restaurants');
 };
 // 3. Ghim / Bỏ ghim bài nổi bật (Toggle Featured)
 module.exports.toggleFeatured = async (req, res) => {
     const { id } = req.params;
-    const camp = await Campground.findById(id);
+    const camp = await Restaurant.findById(id);
     
     camp.isFeatured = !camp.isFeatured; // Đảo ngược true/false
     await camp.save();
     
     req.flash('success', camp.isFeatured ? 'Đã ghim bài lên đầu!' : 'Đã bỏ ghim bài!');
-    res.redirect('/admin/campgrounds');
+    res.redirect('/admin/restaurants');
 };
 // 4. Xóa bài (Dùng lại logic delete cũ nhưng redirect về admin)
-module.exports.deleteCampgroundAdmin = async (req, res) => {
+module.exports.deleteRestaurantAdmin = async (req, res) => {
     const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
+    await Restaurant.findByIdAndDelete(id);
     req.flash('success', 'Đã xóa quán ăn thành công');
-    res.redirect('/admin/campgrounds');
+    res.redirect('/admin/restaurants');
 };
 
 // 5. Bulk actions (Duyệt nhiều, từ chối nhiều, xóa nhiều)
-module.exports.bulkCampgroundsAction = async (req, res) => {
-    let { campgroundIds, action } = req.body;
+module.exports.bulkRestaurantsAction = async (req, res) => {
+    let { restaurantIds, action } = req.body;
     
-    // Nếu chỉ chọn 1 checkbox, campgroundIds là string. Nếu chọn nhiều, nó là array.
-    if (!campgroundIds) {
+    // Nếu chỉ chọn 1 checkbox, restaurantIds là string. Nếu chọn nhiều, nó là array.
+    if (!restaurantIds) {
         req.flash('error', 'Vui lòng chọn ít nhất 1 quán ăn để thực hiện!');
-        return res.redirect(req.get('Referrer') || '/admin/campgrounds');
+        return res.redirect(req.get('Referrer') || '/admin/restaurants');
     }
     
-    if (!Array.isArray(campgroundIds)) {
-        campgroundIds = [campgroundIds];
+    if (!Array.isArray(restaurantIds)) {
+        restaurantIds = [restaurantIds];
     }
     
     if (action === 'approve') {
-        await Campground.updateMany({ _id: { $in: campgroundIds } }, { status: 'approved' });
-        req.flash('success', `Đã duyệt ${campgroundIds.length} quán ăn!`);
+        await Restaurant.updateMany({ _id: { $in: restaurantIds } }, { status: 'approved' });
+        req.flash('success', `Đã duyệt ${restaurantIds.length} quán ăn!`);
     } else if (action === 'reject') {
-        await Campground.updateMany({ _id: { $in: campgroundIds } }, { status: 'rejected' });
-        req.flash('success', `Đã từ chối ${campgroundIds.length} quán ăn!`);
+        await Restaurant.updateMany({ _id: { $in: restaurantIds } }, { status: 'rejected' });
+        req.flash('success', `Đã từ chối ${restaurantIds.length} quán ăn!`);
     } else if (action === 'delete') {
         // Find and delete to trigger mongoose middleware if needed, but for bulk updateMany is faster.
-        // Actually, Campground uses findOneAndDelete middleware to delete reviews/images. 
+        // Actually, Restaurant uses findOneAndDelete middleware to delete reviews/images. 
         // We should loop through them to trigger middlewares.
-        for (let id of campgroundIds) {
-            await Campground.findByIdAndDelete(id);
+        for (let id of restaurantIds) {
+            await Restaurant.findByIdAndDelete(id);
         }
-        req.flash('success', `Đã xóa ${campgroundIds.length} quán ăn!`);
+        req.flash('success', `Đã xóa ${restaurantIds.length} quán ăn!`);
     }
     
-    res.redirect(req.get('Referrer') || '/admin/campgrounds');
+    res.redirect(req.get('Referrer') || '/admin/restaurants');
 };
 module.exports.index = async (req, res) => {
     // 0. Time Filter Setup
@@ -124,7 +124,7 @@ module.exports.index = async (req, res) => {
 
     // 1. Lấy tổng số lượng (Stats Cards) - All Time
     const userCount = await User.countDocuments({});
-    const campCount = await Campground.countDocuments({});
+    const campCount = await Restaurant.countDocuments({});
     const reviewCount = await Review.countDocuments({});
 
     // Thống kê mở rộng
@@ -164,8 +164,8 @@ module.exports.index = async (req, res) => {
         { $sort: { _id: 1 } }
     ]);
 
-    // Tăng trưởng Campgrounds
-    const campGrowth = await Campground.aggregate([
+    // Tăng trưởng Restaurants
+    const campGrowth = await Restaurant.aggregate([
         { $match: dateFilter },
         {
             $group: {
@@ -212,14 +212,14 @@ module.exports.index = async (req, res) => {
     let toxicData = [0, 0]; // [Sạch, Độc hại]
     toxicDist.forEach(t => { if(t._id === true) toxicData[1] = t.count; else toxicData[0] = t.count; });
 
-    // 5. Top Campgrounds (Nhiều reviews nhất)
-    const topCampgrounds = await Campground.find({})
+    // 5. Top Restaurants (Nhiều reviews nhất)
+    const topRestaurants = await Restaurant.find({})
         .sort({ "reviews.length": -1, views: -1 })
         .limit(5)
         .select('title reviews views');
 
     // Phân bổ danh mục
-    const categoryDistribution = await Campground.aggregate([
+    const categoryDistribution = await Restaurant.aggregate([
         { $match: dateFilter },
         {
             $group: {
@@ -239,7 +239,7 @@ module.exports.index = async (req, res) => {
         ratingData: JSON.stringify(ratingData),
         aiSentimentData: JSON.stringify(aiSentimentData),
         toxicData: JSON.stringify(toxicData),
-        topCampgrounds,
+        topRestaurants,
         catLabels: JSON.stringify(catLabels),
         catData: JSON.stringify(catData),
         period,
@@ -376,7 +376,7 @@ module.exports.renderReviews = async (req, res) => {
     const totalReviews = await Review.countDocuments(query);
     const totalPages = Math.ceil(totalReviews / limit);
 
-    // Lấy review và populate cả User lẫn Campground (để biết review ở bài nào)
+    // Lấy review và populate cả User lẫn Restaurant (để biết review ở bài nào)
     const reviews = await Review.find(query)
         .populate('author')
         .sort({ isReported: -1, _id: -1 }) // Ưu tiên review bị báo cáo lên đầu
@@ -399,8 +399,8 @@ module.exports.deleteReviewAdmin = async (req, res) => {
     // Tìm và xóa review
     await Review.findByIdAndDelete(reviewId);
     
-    // Quan trọng: Phải xóa cả ID review trong mảng reviews của Campground
-    await Campground.findOneAndUpdate(
+    // Quan trọng: Phải xóa cả ID review trong mảng reviews của Restaurant
+    await Restaurant.findOneAndUpdate(
         { reviews: reviewId },
         { $pull: { reviews: reviewId } }
     );
@@ -557,12 +557,12 @@ module.exports.exportUsers = async (req, res) => {
     res.end();
 };
 
-module.exports.exportCampgrounds = async (req, res) => {
+module.exports.exportRestaurants = async (req, res) => {
     const { status, pageFrom, pageTo } = req.query;
     let query = {};
     if (status && status !== 'all') query.status = status;
 
-    let dbQuery = Campground.find(query).populate('author').sort({ createdAt: -1 });
+    let dbQuery = Restaurant.find(query).populate('author').sort({ createdAt: -1 });
     
     const itemsPerPage = 10;
     const pFrom = parseInt(pageFrom) || 1;
@@ -575,7 +575,7 @@ module.exports.exportCampgrounds = async (req, res) => {
         dbQuery = dbQuery.limit((pTo - pFrom + 1) * itemsPerPage);
     }
 
-    const campgrounds = await dbQuery;
+    const restaurants = await dbQuery;
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Quán ăn');
     
@@ -591,7 +591,7 @@ module.exports.exportCampgrounds = async (req, res) => {
         { header: 'Ngày đăng', key: 'createdAt', width: 20 },
     ];
     
-    campgrounds.forEach(camp => {
+    restaurants.forEach(camp => {
         let statusText = 'Chờ duyệt';
         if (camp.status === 'approved') statusText = 'Đã duyệt';
         else if (camp.status === 'rejected') statusText = 'Từ chối';

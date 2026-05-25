@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Tạo Schema phụ để lưu thông tin ảnh (giống bên Campground)
+// Tạo Schema phụ để lưu thông tin ảnh (giống bên Restaurant)
 const ImageSchema = new Schema({
     url: String,
     filename: String

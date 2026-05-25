@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(expressMongoSanitize());
 
-const campgroundRoutes = require("./routes/campgrounds");
+const restaurantRoutes = require("./routes/restaurants");
 const reviewRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
 const adminRoutes = require('./routes/admin');
@@ -164,8 +164,8 @@ app.get("/fakeuser", async (req, res) => {
   res.send(newUser);
 });
 
-app.use("/campgrounds", campgroundRoutes);
-app.use("/campgrounds/:id/reviews/", reviewRoutes);
+app.use("/restaurants", restaurantRoutes);
+app.use("/restaurants/:id/reviews/", reviewRoutes);
 app.use("/", userRoutes);
 app.use('/admin', adminRoutes);
 app.get("/", (req, res) => {

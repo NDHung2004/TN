@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const passwordLocalMongoose = require("passport-local-mongoose");
-const Campground = require('../models/campground');
+const Restaurant = require('../models/restaurant');
 const UserSchema = new Schema({
   email: {
     type: String,
@@ -20,7 +20,7 @@ const UserSchema = new Schema({
   favorites: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Campground'
+            ref: 'Restaurant'
         }
     ]
 }, { timestamps: true });

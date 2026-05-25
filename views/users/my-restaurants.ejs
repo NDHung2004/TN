@@ -5,21 +5,21 @@
     <p class="text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">Quản lý các địa điểm ẩm thực mà bạn đã đóng góp cho cộng đồng.</p>
 </div>
 
-<% if(myCampgrounds.length === 0) { %>
+<% if(myRestaurants.length === 0) { %>
     <div class="text-center py-20 bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm" data-aos="fade-up">
         <div class="w-20 h-20 mx-auto bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
             <i class="fas fa-store-slash text-3xl text-gray-400"></i>
         </div>
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Bạn chưa đăng quán ăn nào</h3>
         <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">Hãy chia sẻ những địa điểm ẩm thực tuyệt vời mà bạn biết với mọi người.</p>
-        <a href="/campgrounds/new" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 shadow-md transition-all duration-300">
+        <a href="/restaurants/new" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-primary-600 hover:bg-primary-700 shadow-md transition-all duration-300">
             <i class="fas fa-plus mr-2"></i> Đăng quán ngay
         </a>
     </div>
 <% } else { %>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-        <% for (let i = 0; i < myCampgrounds.length; i++) { %>
-            <% let camp = myCampgrounds[i]; %>
+        <% for (let i = 0; i < myRestaurants.length; i++) { %>
+            <% let camp = myRestaurants[i]; %>
             <div class="bg-white dark:bg-dark-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 transition-all duration-300 flex flex-col h-full" data-aos="fade-up" data-aos-delay="<%= (i % 4) * 50 %>">
                 
                 <div class="relative h-48 overflow-hidden group">
@@ -45,13 +45,13 @@
                     </p>
                     
                     <div class="mt-auto pt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-800 gap-2">
-                        <a href="/campgrounds/<%= camp._id %>" class="flex-1 text-center py-2 px-3 text-sm font-medium text-primary-600 bg-primary-50 dark:bg-primary-900/20 dark:text-primary-400 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
+                        <a href="/restaurants/<%= camp._id %>" class="flex-1 text-center py-2 px-3 text-sm font-medium text-primary-600 bg-primary-50 dark:bg-primary-900/20 dark:text-primary-400 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors">
                             <i class="fas fa-eye"></i> Xem
                         </a>
-                        <a href="/campgrounds/<%= camp._id %>/edit" class="flex-1 text-center py-2 px-3 text-sm font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
+                        <a href="/restaurants/<%= camp._id %>/edit" class="flex-1 text-center py-2 px-3 text-sm font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
                             <i class="fas fa-edit"></i> Sửa
                         </a>
-                        <form action="/campgrounds/<%= camp._id %>?_method=DELETE" method="POST" class="flex-1" onsubmit="return confirm('Bạn có chắc chắn muốn xóa quán ăn này không?');">
+                        <form action="/restaurants/<%= camp._id %>?_method=DELETE" method="POST" class="flex-1" onsubmit="return confirm('Bạn có chắc chắn muốn xóa quán ăn này không?');">
                             <button type="submit" class="w-full text-center py-2 px-3 text-sm font-medium text-rose-600 bg-rose-50 dark:bg-rose-900/20 dark:text-rose-400 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors">
                                 <i class="fas fa-trash-alt"></i> Xóa
                             </button>

@@ -1,32 +1,32 @@
-const Campground = require("../models/campground");
+const Restaurant = require("../models/restaurant");
 const Review = require("../models/reviews");
 const { analyzeReview } = require('../utils/aiAnalyzer');
 module.exports.createReview = async (req, res) => {
-  const campground = await Campground.findById(req.params.id);
+  const restaurant = await Restaurant.findById(req.params.id);
   const review = new Review(req.body.review);
   review.author = req.user._id;
   // Gửi nội dung bình luận cho AI và đợi kết quả (mất khoảng 1-2 giây)
   const aiResult = await analyzeReview(review.body);
   review.sentiment = aiResult.sentiment;
   review.isToxic = aiResult.isToxic;
-  campground.reviews.push(review);
+  restaurant.reviews.push(review);
   await review.save();
-  await campground.save();
+  await restaurant.save();
   if (review.isToxic) {
         req.flash('error', 'Cảnh báo: Bình luận của bạn vi phạm tiêu chuẩn cộng đồng và đã bị ẩn!');
     } else {
         req.flash('success', 'Đã thêm đánh giá thành công!');
     }
   // Duplicate flash msg removed
-  res.redirect(`/campgrounds/${campground._id}`);
+  res.redirect(`/restaurants/${restaurant._id}`);
 };
 
 module.exports.deleteReview = async (req, res) => {
   const { id, reviewId } = req.params;
-  await Campground.findByIdAndUpdate(id, {
+  await Restaurant.findByIdAndUpdate(id, {
     $pull: { reviews: reviewId },
   });
   await Review.findByIdAndDelete(reviewId);
   req.flash("success", "Đã xóa đánh giá thành công!");
-  res.redirect(`/campgrounds/${id}`);
+  res.redirect(`/restaurants/${id}`);
 };

@@ -1,5 +1,5 @@
-const { campgroundSchema, reviewSchema } = require("./schemas.js");
-const Campground = require("./models/campground");
+const { restaurantSchema, reviewSchema } = require("./schemas.js");
+const Restaurant = require("./models/restaurant");
 const Review = require("./models/reviews");
 const ExpressError = require("./utils/ExpressError");
 
@@ -23,7 +23,7 @@ module.exports.isAdmin = (req, res, next) => {
         return next();
     }
     req.flash('error', 'Bạn không có quyền Admin!');
-    res.redirect('/campgrounds');
+    res.redirect('/restaurants');
 }
 module.exports.isModOrAdmin = (req, res, next) => {
     // Cho phép nếu là Admin HOẶC Moderator
@@ -33,25 +33,25 @@ module.exports.isModOrAdmin = (req, res, next) => {
     req.flash('error', 'Bạn không có quyền truy cập!');
     res.redirect('/login');
 }
-module.exports.validateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
+module.exports.validateRestaurant = (req, res, next) => {
+  const { error } = restaurantSchema.validate(req.body);
   if (error) {
     const msg = error.details.map((el) => el.message).join(",");
     throw new ExpressError(msg, 400);
   } else {
     next();
   }
-  const campground = new Campground(req.body.campground);
+  const restaurant = new Restaurant(req.body.restaurant);
 };
 
 module.exports.isAuthor = async (req, res, next) => {
     const { id } = req.params;
-    const campground = await Campground.findById(id);
+    const restaurant = await Restaurant.findById(id);
     
     // SỬA: Nếu không phải tác giả VÀ role không phải admin thì chặn
-    if (!campground.author.equals(req.user._id) && req.user.role !== 'admin') {
+    if (!restaurant.author.equals(req.user._id) && req.user.role !== 'admin') {
         req.flash('error', 'Bạn không có quyền làm việc này!');
-        return res.redirect(`/campgrounds/${id}`);
+        return res.redirect(`/restaurants/${id}`);
     }
     next();
 }
@@ -63,7 +63,7 @@ module.exports.isReviewAuthor = async (req, res, next) => {
     // SỬA: Tương tự như trên
     if (!review.author.equals(req.user._id) && req.user.role !== 'admin') {
         req.flash('error', 'Bạn không có quyền xóa review này!');
-        return res.redirect(`/campgrounds/${id}`);
+        return res.redirect(`/restaurants/${id}`);
     }
     next();
 }
