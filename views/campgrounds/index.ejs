@@ -185,5 +185,7 @@
 <script>
   const mapToken = "<%-process.env.MAPBOX_TOKEN %>";
   const campgrounds = {features: <%- JSON.stringify(allCampgroundsForMap) %>};
+  const userLat = <%= typeof lat !== 'undefined' && lat ? lat : 'null' %>;
+  const userLng = <%= typeof lng !== 'undefined' && lng ? lng : 'null' %>;
 </script>
 <script src="/javascript/clustermap.js"></script>

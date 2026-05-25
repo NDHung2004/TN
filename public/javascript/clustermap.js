@@ -158,18 +158,44 @@ map.on("load", () => {
     },
   });
 });
-if (campgrounds.features.length > 0) {
+if (campgrounds.features.length > 0 || (typeof userLat !== 'undefined' && userLat !== null && typeof userLng !== 'undefined' && userLng !== null)) {
     const bounds = new mapboxgl.LngLatBounds();
 
     // Duyệt qua tất cả các quán ăn trong kết quả tìm kiếm để lấy tọa độ
-    campgrounds.features.forEach(function (feature) {
-        bounds.extend(feature.geometry.coordinates);
-    });
+    if (campgrounds.features && campgrounds.features.length > 0) {
+        campgrounds.features.forEach(function (feature) {
+            bounds.extend(feature.geometry.coordinates);
+        });
+    }
 
-    // Ép bản đồ co giãn (fit) để hiển thị vừa khít tất cả các quán vừa tìm được
+    // Nếu có vị trí người dùng, thêm marker và mở rộng bounds
+    if (typeof userLat !== 'undefined' && userLat !== null && typeof userLng !== 'undefined' && userLng !== null) {
+        const userCoords = [parseFloat(userLng), parseFloat(userLat)];
+        
+        // Tạo Marker màu đỏ cho người dùng
+        const el = document.createElement('div');
+        el.className = 'user-marker';
+        el.style.backgroundColor = '#ef4444'; // Red
+        el.style.width = '20px';
+        el.style.height = '20px';
+        el.style.borderRadius = '50%';
+        el.style.border = '3px solid white';
+        el.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+        el.style.cursor = 'pointer';
+
+        new mapboxgl.Marker(el)
+            .setLngLat(userCoords)
+            .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML('<strong>Vị trí của bạn</strong>'))
+            .addTo(map);
+
+        // Mở rộng bounds để chứa luôn vị trí người dùng
+        bounds.extend(userCoords);
+    }
+
+    // Ép bản đồ co giãn (fit) để hiển thị vừa khít tất cả các quán (và người dùng)
     map.fitBounds(bounds, {
         padding: 50,  // Khoảng cách đệm (để chấm không bị sát mép bản đồ quá)
-        maxZoom: 15,  // Mức zoom tối đa (tránh zoom quá sát nếu chỉ có 1 quán)
+        maxZoom: 15,  // Mức zoom tối đa (tránh zoom quá sát nếu chỉ có 1 điểm)
         duration: 1000 // Hiệu ứng lướt tới trong 1 giây (nhìn cho mượt)
     });
 }
