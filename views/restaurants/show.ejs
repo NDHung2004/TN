@@ -380,7 +380,38 @@
                                     </div>
                     </div>
         </div>
-    </div>
+    </div> <!-- END grid-cols-12 -->
+
+        <!-- Quán ăn tương tự -->
+        <% if (typeof similarRestaurants !== 'undefined' && similarRestaurants.length > 0) { %>
+        <div class="mt-12 mb-8" data-aos="fade-up">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                <i class="fas fa-utensils text-primary-500 mr-2"></i> Có thể bạn cũng thích
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% for (let sim of similarRestaurants) { %>
+                    <a href="/restaurants/<%= sim._id %>" class="group bg-white dark:bg-dark-card rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-300 transform hover:-translate-y-1 block flex flex-col">
+                        <div class="relative h-40 overflow-hidden shrink-0">
+                            <% if (sim.images && sim.images.length > 0) { %>
+                                <img src="<%= sim.images[0].url %>" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="<%= sim.title %>">
+                            <% } else { %>
+                                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Mặc định">
+                            <% } %>
+                            <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm dark:bg-gray-900/90 px-2 py-1 rounded-lg text-xs font-bold text-gray-800 dark:text-gray-100 shadow-sm flex items-center gap-1">
+                                <i class="fas fa-star text-yellow-400"></i> <%= sim.avgRating ? sim.avgRating.toFixed(1) : 'Mới' %>
+                            </div>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col">
+                            <h4 class="font-bold text-gray-900 dark:text-white text-base mb-1 line-clamp-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"><%= sim.title %></h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mb-2 mt-auto">
+                                <i class="fas fa-map-marker-alt mr-1"></i> <%= sim.location %>
+                            </p>
+                        </div>
+                    </a>
+                <% } %>
+            </div>
+        </div>
+        <% } %>
 
     <script>
         const mapToken = "<%-process.env.MAPBOX_TOKEN %>";

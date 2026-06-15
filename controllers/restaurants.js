@@ -16,6 +16,15 @@ function escapeRegex(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
 
+function getOptimizedLocationQuery(location) {
+    let query = location.trim();
+    const lowerQuery = query.toLowerCase();
+    if (!lowerQuery.includes('việt nam') && !lowerQuery.includes('vietnam')) {
+        query += ", Việt Nam";
+    }
+    return query;
+}
+
 module.exports.index = async (req, res) => {
     
     // 1. Cấu hình phân trang
@@ -250,8 +259,9 @@ module.exports.renderNewForm = async (req, res) => {
 }
 
 module.exports.createRestaurant = async (req, res, next) => {
+  const optimizedQuery = getOptimizedLocationQuery(req.body.restaurant.location);
   const geoData = await geocoder
-    .forwardGeocode({ query: req.body.restaurant.location, limit: 1 })
+    .forwardGeocode({ query: optimizedQuery, limit: 1, countries: ['vn'], language: ['vi'] })
     .send();
   const restaurant = new Restaurant(req.body.restaurant);
   restaurant.geometry = geoData.body.features[0].geometry;
@@ -326,8 +336,33 @@ module.exports.showRestaurant = async (req, res) => {
         userDislikes = dislikes.map(d => d.review.toString());
     }
 
-    // Truyền thêm aiStats, isFavorited, isFollowing, userLikes, userDislikes vào view
-    res.render('restaurants/show', { restaurant, aiStats, isFavorited, isFollowing, userLikes, userDislikes });
+    // --- TÌM CÁC QUÁN ĂN TƯƠNG TỰ CÙNG DANH MỤC ---
+    const rawSimilarRestaurants = await Restaurant.find({ 
+        category: restaurant.category, 
+        _id: { $ne: restaurant._id },
+        status: 'approved'
+    }).populate('reviews').limit(4);
+
+    let similarRestaurants = [];
+    for (let camp of rawSimilarRestaurants) {
+        let obj = camp.toObject({ virtuals: true });
+        if (camp.reviews && camp.reviews.length > 0) {
+            let totalRating = 0;
+            for (let r of camp.reviews) {
+                if (r.rating) totalRating += r.rating;
+            }
+            obj.avgRating = totalRating / camp.reviews.length;
+            obj.reviewCount = camp.reviews.length;
+        } else {
+            obj.avgRating = 0;
+            obj.reviewCount = 0;
+        }
+        similarRestaurants.push(obj);
+    }
+    // ----------------------------------------------
+
+    // Truyền thêm aiStats, isFavorited, isFollowing, userLikes, userDislikes, similarRestaurants vào view
+    res.render('restaurants/show', { restaurant, aiStats, isFavorited, isFollowing, userLikes, userDislikes, similarRestaurants });
 }
 
 module.exports.renderEditForm = async (req, res) => {
@@ -342,9 +377,15 @@ module.exports.renderEditForm = async (req, res) => {
 
 module.exports.updateRestaurant = async (req, res) => {
   const { id } = req.params;
-  const restaurant = await Restaurant.findByIdAndUpdate(id, {
-    ...req.body.restaurant,
-  });
+  const restaurant = await Restaurant.findById(id);
+  if (req.body.restaurant.location !== restaurant.location) {
+      const optimizedQuery = getOptimizedLocationQuery(req.body.restaurant.location);
+      const geoData = await geocoder
+        .forwardGeocode({ query: optimizedQuery, limit: 1, countries: ['vn'], language: ['vi'] })
+        .send();
+      restaurant.geometry = geoData.body.features[0].geometry;
+  }
+  Object.assign(restaurant, req.body.restaurant);
   const imgs = req.files.map((f) => ({
     url: f.secure_url,
     filename: f.public_id,
