@@ -31,8 +31,8 @@ const RestaurantSchema = new Schema(
       },
     },
     category: {
-        type: String,
-        default: 'Khác' // Nếu bài cũ chưa có thì mặc định là Khác
+      type: String,
+      default: 'Khác'
     },
     author: {
       type: Schema.Types.ObjectId,
@@ -45,17 +45,17 @@ const RestaurantSchema = new Schema(
       },
     ],
     status: {
-        type: String,
-        enum: ['pending', 'approved', 'rejected'],
-        default: 'pending' // Mặc định đăng xong là Chờ duyệt
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending'
     },
     isFeatured: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false
     },
     views: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0
     }
   },
   {

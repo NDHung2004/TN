@@ -81,6 +81,10 @@
                                         <div
                                             class="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-card rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
                                             <div class="py-1">
+                                                <a href="/profile/<%= currentUser._id %>"
+                                                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                                    <i class="fas fa-user-circle text-primary-500 w-4"></i> Trang cá nhân
+                                                </a>
                                                 <a href="/restaurants/new"
                                                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                                     <i class="fas fa-plus-circle text-primary-500 w-4"></i> Đăng Quán
@@ -149,6 +153,8 @@
                             <%= currentUser.username %>
                         </span>
                     </div>
+                    <a href="/profile/<%= currentUser._id %>"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Trang cá nhân</a>
                     <a href="/restaurants/new"
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Đăng
                         Quán mới</a>

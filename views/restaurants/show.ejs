@@ -1,258 +1,412 @@
 <% layout("/layouts/boilerplate") %>
-<link rel="stylesheet" href="/stylesheets/stars.css" />
+    <link rel="stylesheet" href="/stylesheets/stars.css" />
 
-<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" data-aos="fade-down">
-    <a href="/restaurants" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors">
-        <i class="fas fa-arrow-left mr-2"></i> Quay lại danh sách
-    </a>
-</div>
-
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-    <!-- Cột trái: Hình ảnh & Thông tin -->
-    <div class="lg:col-span-7 space-y-6">
-        
-        <!-- Image Gallery -->
-        <div class="bg-white dark:bg-dark-card rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800" data-aos="fade-up">
-            <% if(restaurant.images.length > 0) { %>
-                <div class="relative w-full h-[400px] sm:h-[500px] overflow-hidden bg-gray-100 dark:bg-gray-800" id="mainImageContainer">
-                    <img id="mainImage" src="<%= restaurant.images[0].url %>" alt="<%= restaurant.title %>" class="w-full h-full object-cover transition-opacity duration-300">
-                </div>
-                
-                <% if(restaurant.images.length > 1) { %>
-                    <!-- Persistent Thumbnail Strip below main image -->
-                    <div class="p-4 bg-gray-50 dark:bg-gray-800/50 flex gap-3 overflow-x-auto custom-scrollbar">
-                        <% restaurant.images.forEach((img, i) => { %>
-                            <button class="thumbnail-btn shrink-0 w-20 h-16 sm:w-24 sm:h-20 rounded-xl overflow-hidden border-2 <%= i === 0 ? 'border-primary-500' : 'border-transparent' %> hover:border-primary-400 focus:outline-none focus:border-primary-500 transition-colors shadow-sm" data-src="<%= img.url %>">
-                                <img src="<%= img.url %>" class="w-full h-full object-cover pointer-events-none">
-                            </button>
-                        <% }) %>
-                    </div>
-                <% } %>
-            <% } else { %>
-                <div class="w-full h-[400px] sm:h-[500px] bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center">
-                    <i class="fas fa-image text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">Chưa có hình ảnh</p>
-                </div>
-            <% } %>
-        </div>
-
-        <!-- Thông tin chính -->
-        <div class="bg-white dark:bg-dark-card rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-800 relative" data-aos="fade-up" data-aos-delay="100">
-            <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
-                <div>
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
-                            <i class="fas fa-tag mr-1.5"></i> <%= restaurant.category || 'Ẩm thực' %>
-                        </span>
-                        <span class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-user-circle mr-1.5 text-gray-400"></i> <%= restaurant.author.username %>
-                        </span>
-                    </div>
-                    <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight"><%= restaurant.title %></h1>
-                </div>
-
-                <% if(currentUser) { %>
-                    <form action="/restaurants/<%= restaurant._id %>/favorite" method="POST">
-                        <% if(currentUser.favorites.includes(restaurant._id)) { %>
-                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400 dark:hover:bg-rose-900/40 transition-colors shadow-sm">
-                                <i class="fas fa-heart mr-2"></i> ĐÃ THÍCH
-                            </button>
-                        <% } else { %>
-                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:text-rose-600 dark:bg-dark-card dark:border-gray-700 dark:text-gray-300 dark:hover:text-rose-400 dark:hover:border-rose-500/50 transition-colors shadow-sm">
-                                <i class="far fa-heart mr-2"></i> YÊU THÍCH
-                            </button>
-                        <% } %>
-                    </form>
-                <% } %>
-            </div>
-
-            <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-6"><%= restaurant.description %></p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-6 border-y border-gray-100 dark:border-gray-800">
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
-                        <i class="fas fa-money-bill-wave text-emerald-600 dark:text-emerald-400"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">Giá trung bình</p>
-                        <p class="text-lg font-bold text-gray-900 dark:text-white">₫<%= restaurant.price %><span class="text-sm font-normal text-gray-500">/người</span></p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
-                        <i class="fas fa-map-marker-alt text-blue-600 dark:text-blue-400"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">Địa chỉ</p>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white"><%= restaurant.location %></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action buttons cho Author / Admin -->
-            <% if(currentUser && (restaurant.author.equals(currentUser) || currentUser.role === 'admin')) { %>
-                <div class="flex items-center gap-3 mt-6 pt-2">
-                    <a href="/restaurants/<%=restaurant._id%>/edit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-primary-700 bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50 transition-colors">
-                        <i class="fas fa-edit mr-2"></i> Chỉnh sửa
-                    </a>
-                    <form action="/restaurants/<%=restaurant._id%>?_method=DELETE" method="POST" class="inline-block" onsubmit="return confirm('Bạn có chắc chắn muốn xóa quán ăn này không?');">
-                        <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 transition-colors">
-                            <i class="fas fa-trash-alt mr-2"></i> Xóa quán
-                        </button>
-                    </form>
-                </div>
-            <% } %>
-        </div>
+    <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4" data-aos="fade-down">
+        <a href="/restaurants"
+            class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i> Quay lại danh sách
+        </a>
     </div>
 
-    <!-- Cột phải: Sidebar (Map, AI Stats, Reviews) -->
-    <div class="lg:col-span-5 space-y-6">
-        
-        <!-- Bản đồ -->
-        <div class="bg-white dark:bg-dark-card rounded-2xl p-1 shadow-sm border border-gray-100 dark:border-gray-800" data-aos="fade-up" data-aos-delay="200">
-            <div id="map" class="w-full h-[300px] rounded-[14px]"></div>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+        <!-- Cột trái: Hình ảnh & Thông tin -->
+        <div class="lg:col-span-7 space-y-6">
 
-        <!-- AI Stats (Without AI Header) -->
-        <% if (aiStats.total > 0) { %>
-            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-2xl p-6 shadow-sm border border-indigo-100 dark:border-indigo-800/30 mb-6" data-aos="fade-up" data-aos-delay="250">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider flex items-center">
-                        <i class="fas fa-chart-pie text-indigo-500 mr-2"></i> Thống kê đánh giá
-                    </h3>
-                    <span class="px-2.5 py-1 bg-white dark:bg-dark-bg rounded-lg text-xs font-medium text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <%= aiStats.total %> Đánh giá
-                    </span>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="flex justify-between items-end text-sm font-bold">
-                        <span class="text-emerald-600 dark:text-emerald-400 flex items-center"><i class="fas fa-smile mr-1.5"></i> <%= aiStats.positivePct %>% Tích cực</span>
-                        <span class="text-rose-600 dark:text-rose-400 flex items-center"><%= aiStats.negativePct %>% Tiêu cực <i class="fas fa-frown ml-1.5"></i></span>
+            <!-- Image Gallery -->
+            <div class="bg-white dark:bg-dark-card rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800"
+                data-aos="fade-up">
+                <% if(restaurant.images.length> 0) { %>
+                    <div class="relative w-full h-[400px] sm:h-[500px] overflow-hidden bg-gray-100 dark:bg-gray-800"
+                        id="mainImageContainer">
+                        <img id="mainImage" src="<%= restaurant.images[0].url %>" alt="<%= restaurant.title %>"
+                            class="w-full h-full object-cover transition-opacity duration-300">
                     </div>
-                    
-                    <div class="w-full h-3 rounded-full overflow-hidden flex bg-gray-200 dark:bg-gray-700">
-                        <div class="bg-emerald-500 h-full transition-all duration-1000" style="width: <%= aiStats.positivePct %>%"></div>
-                        <div class="bg-rose-500 h-full transition-all duration-1000" style="width: <%= aiStats.negativePct %>%"></div>
-                    </div>
-                </div>
+
+                    <% if(restaurant.images.length> 1) { %>
+                        <!-- Persistent Thumbnail Strip below main image -->
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800/50 flex gap-3 overflow-x-auto custom-scrollbar">
+                            <% restaurant.images.forEach((img, i)=> { %>
+                                <button
+                                    class="thumbnail-btn shrink-0 w-20 h-16 sm:w-24 sm:h-20 rounded-xl overflow-hidden border-2 <%= i === 0 ? 'border-primary-500' : 'border-transparent' %> hover:border-primary-400 focus:outline-none focus:border-primary-500 transition-colors shadow-sm"
+                                    data-src="<%= img.url %>">
+                                    <img src="<%= img.url %>" class="w-full h-full object-cover pointer-events-none">
+                                </button>
+                                <% }) %>
+                        </div>
+                        <% } %>
+                            <% } else { %>
+                                <div
+                                    class="w-full h-[400px] sm:h-[500px] bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center">
+                                    <i class="fas fa-image text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                                    <p class="text-gray-500 dark:text-gray-400 font-medium">Chưa có hình ảnh</p>
+                                </div>
+                                <% } %>
             </div>
-        <% } %>
 
-        <!-- Đánh giá Section -->
-        <div class="bg-white dark:bg-dark-card rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800" data-aos="fade-up" data-aos-delay="300">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">Đánh giá từ cộng đồng</h3>
-            
-            <% if(currentUser) { %>
-                <div class="mb-8 p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
-                    <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Chia sẻ trải nghiệm của bạn</h4>
-                    <form action="/restaurants/<%=restaurant._id%>/reviews" method="POST" class="validated-form" novalidate>
-                        <div class="mb-3">
-                            <fieldset class="starability-basic">
-                                <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-                                <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                                <label for="first-rate1" title="Terrible">1 sao</label>
-                                <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                                <label for="first-rate2" title="Not good">2 sao</label>
-                                <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                                <label for="first-rate3" title="Average">3 sao</label>
-                                <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                                <label for="first-rate4" title="Very good">4 sao</label>
-                                <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                                <label for="first-rate5" title="Amazing">5 sao</label>
-                            </fieldset>
+            <!-- Thông tin chính -->
+            <div class="bg-white dark:bg-dark-card rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-800 relative"
+                data-aos="fade-up" data-aos-delay="100">
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
+                                <i class="fas fa-tag mr-1.5"></i>
+                                <%= restaurant.category || 'Ẩm thực' %>
+                            </span>
+                            <span class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-user-circle mr-1.5 text-gray-400"></i>
+                                <a href="/profile/<%= restaurant.author._id %>"
+                                    class="hover:text-primary-500 hover:underline transition-colors">
+                                    <%= restaurant.author.username %>
+                                </a>
+                            </span>
                         </div>
-                        <div class="mb-4">
-                            <textarea class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none" name="review[body]" rows="3" placeholder="Quán ăn này thế nào? Đồ ăn có ngon không?" required></textarea>
-                            <div class="invalid-feedback text-sm text-red-500 mt-1">Vui lòng nhập nội dung đánh giá.</div>
-                        </div>
-                        <button type="submit" class="w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 text-white font-medium rounded-xl shadow-sm transition-colors">
-                            Gửi đánh giá
-                        </button>
-                    </form>
-                </div>
-            <% } else { %>
-                <div class="mb-8 p-6 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30 text-center">
-                    <p class="text-sm text-blue-800 dark:text-blue-300 mb-3">Bạn cần đăng nhập để để lại đánh giá.</p>
-                    <a href="/login" class="inline-flex px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">Đăng nhập ngay</a>
-                </div>
-            <% } %>
+                        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                            <%= restaurant.title %>
+                        </h1>
 
-            <!-- Danh sách Reviews -->
-            <div class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                <% if(restaurant.reviews.length === 0) { %>
-                    <p class="text-center text-gray-500 dark:text-gray-400 py-4 text-sm">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
-                <% } %>
-
-                <% for(let review of restaurant.reviews) { %>
-                    <div class="p-4 bg-white dark:bg-dark-card border border-gray-100 dark:border-gray-700 rounded-xl hover:shadow-md transition-shadow">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300">
-                                    <%= review.author.username[0].toUpperCase() %>
-                                </div>
-                                <div>
-                                    <h5 class="text-sm font-bold text-gray-900 dark:text-white"><%= review.author.username %></h5>
-                                    <p class="starability-result text-[10px]" data-rating="<%= review.rating %>"></p>
-                                </div>
-                            </div>
-                            
-                            <% if(review.sentiment === 'positive') { %>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
-                                    <i class="fas fa-smile mr-1"></i> Tích cực
-                                </span>
-                            <% } else if(review.sentiment === 'negative') { %>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400">
-                                    <i class="fas fa-frown mr-1"></i> Tiêu cực
-                                </span>
+                        <% if(currentUser && !restaurant.author.equals(currentUser._id)) { %>
+                            <button
+                                class="btn-follow mt-2 px-3 py-1 text-xs font-medium rounded-full transition-colors <%= isFollowing ? 'bg-gray-200 text-gray-800' : 'bg-blue-600 text-white' %>"
+                                data-user-id="<%= restaurant.author._id %>">
+                                <%= isFollowing ? 'Đang theo dõi' : 'Theo dõi' %>
+                            </button>
                             <% } %>
-                        </div>
-                        
-                        <% if(review.isToxic) { %>
-                            <div class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg flex items-start gap-2">
-                                <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
-                                <p class="text-xs text-amber-800 dark:text-amber-400 leading-relaxed">Nội dung đã bị ẩn vì vi phạm tiêu chuẩn cộng đồng (chứa ngôn từ thô tục/xúc phạm).</p>
-                            </div>
-                        <% } else { %>
-                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed"><%= review.body %></p>
-                        <% } %>
-                        
-                        <% if(currentUser && review.author.equals(currentUser._id)) { %>
-                            <form action="/restaurants/<%=restaurant._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST" class="mt-3 text-right">
-                                <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors">Xóa</button>
-                            </form>
-                        <% } %>
                     </div>
-                <% } %>
+
+                    <% if(currentUser) { %>
+                        <div>
+                            <% if(isFavorited) { %>
+                                <button
+                                    class="btn-favorite inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-bold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400 dark:hover:bg-rose-900/40 transition-colors shadow-sm"
+                                    data-restaurant-id="<%= restaurant._id %>">
+                                    <i class="fas fa-heart mr-2"></i> ĐÃ THÍCH
+                                </button>
+                                <% } else { %>
+                                    <button
+                                        class="btn-favorite inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:text-rose-600 dark:bg-dark-card dark:border-gray-700 dark:text-gray-300 dark:hover:text-rose-400 dark:hover:border-rose-500/50 transition-colors shadow-sm"
+                                        data-restaurant-id="<%= restaurant._id %>">
+                                        <i class="far fa-heart mr-2"></i> YÊU THÍCH
+                                    </button>
+                                    <% } %>
+                        </div>
+                        <% } %>
+                </div>
+
+                <p class="text-gray-600 dark:text-gray-300 text-base leading-relaxed mb-6">
+                    <%= restaurant.description %>
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-6 border-y border-gray-100 dark:border-gray-800">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
+                            <i class="fas fa-money-bill-wave text-emerald-600 dark:text-emerald-400"></i>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">
+                                Giá trung bình</p>
+                            <p class="text-lg font-bold text-gray-900 dark:text-white">₫<%= restaurant.price %><span
+                                        class="text-sm font-normal text-gray-500">/người</span></p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+                            <i class="fas fa-map-marker-alt text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p
+                                class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-0.5">
+                                Địa chỉ</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                <%= restaurant.location %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action buttons cho Author / Admin -->
+                <% if(currentUser && (restaurant.author.equals(currentUser) || currentUser.role==='admin' )) { %>
+                    <div class="flex items-center gap-3 mt-6 pt-2">
+                        <a href="/restaurants/<%=restaurant._id%>/edit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-primary-700 bg-primary-100 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50 transition-colors">
+                            <i class="fas fa-edit mr-2"></i> Chỉnh sửa
+                        </a>
+                        <form action="/restaurants/<%=restaurant._id%>?_method=DELETE" method="POST"
+                            class="inline-block"
+                            onsubmit="return confirm('Bạn có chắc chắn muốn xóa quán ăn này không?');">
+                            <button
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 transition-colors">
+                                <i class="fas fa-trash-alt mr-2"></i> Xóa quán
+                            </button>
+                        </form>
+                    </div>
+                    <% } %>
             </div>
         </div>
+
+        <!-- Cột phải: Sidebar (Map, AI Stats, Reviews) -->
+        <div class="lg:col-span-5 space-y-6">
+
+            <!-- Bản đồ -->
+            <div class="bg-white dark:bg-dark-card rounded-2xl p-1 shadow-sm border border-gray-100 dark:border-gray-800"
+                data-aos="fade-up" data-aos-delay="200">
+                <div id="map" class="w-full h-[300px] rounded-[14px]"></div>
+            </div>
+
+            <!-- AI Stats (Without AI Header) -->
+            <% if (aiStats.total> 0) { %>
+                <div class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-2xl p-6 shadow-sm border border-indigo-100 dark:border-indigo-800/30 mb-6"
+                    data-aos="fade-up" data-aos-delay="250">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3
+                            class="text-sm font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider flex items-center">
+                            <i class="fas fa-chart-pie text-indigo-500 mr-2"></i> Thống kê đánh giá
+                        </h3>
+                        <span
+                            class="px-2.5 py-1 bg-white dark:bg-dark-bg rounded-lg text-xs font-medium text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 shadow-sm">
+                            <%= aiStats.total %> Đánh giá
+                        </span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-end text-sm font-bold">
+                            <span class="text-emerald-600 dark:text-emerald-400 flex items-center"><i
+                                    class="fas fa-smile mr-1.5"></i>
+                                <%= aiStats.positivePct %>% Tích cực
+                            </span>
+                            <span class="text-rose-600 dark:text-rose-400 flex items-center">
+                                <%= aiStats.negativePct %>% Tiêu cực <i class="fas fa-frown ml-1.5"></i>
+                            </span>
+                        </div>
+
+                        <div class="w-full h-3 rounded-full overflow-hidden flex bg-gray-200 dark:bg-gray-700">
+                            <div class="bg-emerald-500 h-full transition-all duration-1000"
+                                style="width: <%= aiStats.positivePct %>%"></div>
+                            <div class="bg-rose-500 h-full transition-all duration-1000"
+                                style="width: <%= aiStats.negativePct %>%"></div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                    <!-- Đánh giá Section -->
+                    <div class="bg-white dark:bg-dark-card rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800"
+                        data-aos="fade-up" data-aos-delay="300">
+                        <h3
+                            class="text-xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
+                            Đánh giá từ cộng đồng</h3>
+
+                        <% if(currentUser) { %>
+                            <div
+                                class="mb-8 p-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                                <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Chia sẻ trải nghiệm của
+                                    bạn</h4>
+                                <form action="/restaurants/<%=restaurant._id%>/reviews" method="POST"
+                                    class="validated-form" novalidate>
+                                    <div class="mb-3">
+                                        <fieldset class="starability-basic">
+                                            <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]"
+                                                value="1" checked aria-label="No rating." />
+                                            <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                                            <label for="first-rate1" title="Terrible">1 sao</label>
+                                            <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                                            <label for="first-rate2" title="Not good">2 sao</label>
+                                            <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                                            <label for="first-rate3" title="Average">3 sao</label>
+                                            <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                                            <label for="first-rate4" title="Very good">4 sao</label>
+                                            <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                                            <label for="first-rate5" title="Amazing">5 sao</label>
+                                        </fieldset>
+                                    </div>
+                                    <div class="mb-4">
+                                        <textarea
+                                            class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none"
+                                            name="review[body]" rows="3"
+                                            placeholder="Quán ăn này thế nào? Đồ ăn có ngon không?" required></textarea>
+                                        <div class="invalid-feedback text-sm text-red-500 mt-1">Vui lòng nhập nội dung
+                                            đánh giá.</div>
+                                    </div>
+                                    <button type="submit"
+                                        class="w-full py-2.5 px-4 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 text-white font-medium rounded-xl shadow-sm transition-colors">
+                                        Gửi đánh giá
+                                    </button>
+                                </form>
+                            </div>
+                            <% } else { %>
+                                <div
+                                    class="mb-8 p-6 bg-blue-50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30 text-center">
+                                    <p class="text-sm text-blue-800 dark:text-blue-300 mb-3">Bạn cần đăng nhập để để lại
+                                        đánh giá.</p>
+                                    <a href="/login"
+                                        class="inline-flex px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">Đăng
+                                        nhập ngay</a>
+                                </div>
+                                <% } %>
+
+                                    <!-- Danh sách Reviews -->
+                                    <div class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                                        <% if(restaurant.reviews.length===0) { %>
+                                            <p class="text-center text-gray-500 dark:text-gray-400 py-4 text-sm">Chưa có
+                                                đánh giá nào. Hãy là người đầu tiên!</p>
+                                            <% } %>
+
+                                                <% for(let review of restaurant.reviews) { %>
+                                                    <div
+                                                        class="p-4 bg-white dark:bg-dark-card border border-gray-100 dark:border-gray-700 rounded-xl hover:shadow-md transition-shadow">
+                                                        <div class="flex justify-between items-start mb-2">
+                                                            <div class="flex items-center gap-2">
+                                                                <% if(review.author.avatar && review.author.avatar.url && !review.author.avatar.url.includes('default-avatar.jpg'))
+                                                                    { %>
+                                                                    <img src="<%= review.author.avatar.url %>"
+                                                                        class="w-8 h-8 rounded-full object-cover">
+                                                                    <% } else { %>
+                                                                        <div
+                                                                            class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
+                                                                            <%= review.author.username.charAt(0) %>
+                                                                        </div>
+                                                                        <% } %>
+                                                                            <div>
+                                                                                <h5
+                                                                                    class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                                                                    <a href="/profile/<%= review.author._id %>"
+                                                                                        class="hover:text-primary-500 hover:underline transition-colors">
+                                                                                        <%= review.author.username %>
+                                                                                    </a>
+                                                                                    <% if(review.isReported && currentUser && currentUser.role==='admin' ) { %>
+                                                                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                                                                            <i class="fas fa-flag mr-1"></i> Đã báo cáo
+                                                                                        </span>
+                                                                                    <% } %>
+                                                                                </h5>
+                                                                                <div
+                                                                                    class="flex items-center text-xs font-bold text-yellow-500 mt-0.5">
+                                                                                    <%= review.rating %> <i
+                                                                                            class="fas fa-star ml-1"></i>
+                                                                                </div>
+                                                                            </div>
+                                                            </div>
+                                                            <div class="flex items-center gap-2">
+                                                                <% if(review.sentiment==='positive' ) { %>
+                                                                    <span
+                                                                        class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                                                        <i class="fas fa-smile mr-1"></i> Tích cực
+                                                                    </span>
+                                                                    <% } else if(review.sentiment==='negative' ) { %>
+                                                                        <span
+                                                                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400">
+                                                                            <i class="fas fa-frown mr-1"></i> Tiêu cực
+                                                                        </span>
+                                                                        <% } %>
+
+                                                                        <button class="btn-like flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" data-review-id="<%= review._id %>">
+                                                                            <% if(userLikes.includes(review._id.toString())) { %>
+                                                                                <i class="fas fa-heart text-red-500 mr-1"></i>
+                                                                            <% } else { %>
+                                                                                <i class="far fa-heart mr-1"></i>
+                                                                            <% } %>
+                                                                            <span class="like-count font-medium"><%= review.likeCount || 0 %></span>
+                                                                        </button>
+
+                                                                        <button class="btn-dislike flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors mr-1" data-review-id="<%= review._id %>">
+                                                                            <% if(userDislikes && userDislikes.includes(review._id.toString())) { %>
+                                                                                <i class="fas fa-thumbs-down text-blue-500 mr-1"></i>
+                                                                            <% } else { %>
+                                                                                <i class="far fa-thumbs-down mr-1"></i>
+                                                                            <% } %>
+                                                                            <span class="dislike-count font-medium"><%= review.dislikeCount || 0 %></span>
+                                                                        </button>
+
+                                                                            <% if(currentUser &&
+                                                                                !review.author.equals(currentUser._id)
+                                                                                && !review.isReported) { %>
+                                                                                <form
+                                                                                    action="/restaurants/<%=restaurant._id%>/reviews/<%=review._id%>/report?_method=PATCH"
+                                                                                    method="POST" class="inline">
+                                                                                    <button type="submit"
+                                                                                        class="text-gray-400 hover:text-red-500 transition-colors"
+                                                                                        title="Báo cáo bình luận"
+                                                                                        onclick="return confirm('Bạn có chắc chắn muốn báo cáo bình luận này?');">
+                                                                                        <i
+                                                                                            class="fas fa-flag text-xs"></i>
+                                                                                    </button>
+                                                                                </form>
+                                                                                <% } else if (review.isReported) { %>
+                                                                                    <span class="text-xs text-red-400"
+                                                                                        title="Đã bị báo cáo"><i
+                                                                                            class="fas fa-flag"></i></span>
+                                                                                    <% } %>
+                                                            </div>
+                                                        </div>
+
+                                                        <% if(review.isToxic) { %>
+                                                            <div
+                                                                class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg flex items-start gap-2">
+                                                                <i
+                                                                    class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+                                                                <p
+                                                                    class="text-xs text-amber-800 dark:text-amber-400 leading-relaxed">
+                                                                    Nội dung đã bị ẩn vì vi phạm tiêu chuẩn cộng đồng
+                                                                    (chứa ngôn từ thô tục/xúc phạm).</p>
+                                                            </div>
+                                                            <% } else { %>
+                                                                <p
+                                                                    class="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">
+                                                                    <%= review.body %>
+                                                                </p>
+                                                                <% } %>
+
+
+
+                                                                            <% if(currentUser &&
+                                                                                review.author.equals(currentUser._id)) {
+                                                                                %>
+                                                                                <form
+                                                                                    action="/restaurants/<%=restaurant._id%>/reviews/<%=review._id%>?_method=DELETE"
+                                                                                    method="POST"
+                                                                                    class="mt-3 text-right">
+                                                                                    <button type="submit"
+                                                                                        class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors">Xóa</button>
+                                                                                </form>
+                                                                                <% } %>
+
+
+                                                    </div>
+                                                    <% } %>
+                                    </div>
+                    </div>
+        </div>
     </div>
-</div>
 
-<script>
-  const mapToken = "<%-process.env.MAPBOX_TOKEN %>";
-  const restaurant = <%- JSON.stringify(restaurant) %>
+    <script>
+        const mapToken = "<%-process.env.MAPBOX_TOKEN %>";
+        const restaurant = <%- JSON.stringify(restaurant) %>
 
-  // Image Gallery Logic
-  document.addEventListener('DOMContentLoaded', () => {
-      const mainImage = document.getElementById('mainImage');
-      const thumbnails = document.querySelectorAll('.thumbnail-btn');
-      
-      if(mainImage && thumbnails.length > 0) {
-          thumbnails.forEach(btn => {
-              btn.addEventListener('click', function() {
-                  // Thay đổi ảnh chính
-                  const newSrc = this.getAttribute('data-src');
-                  mainImage.src = newSrc;
-                  
-                  // Cập nhật viền cho thumbnail đang được chọn
-                  thumbnails.forEach(t => t.classList.remove('border-primary-500', 'border-transparent'));
-                  thumbnails.forEach(t => t.classList.add('border-transparent'));
-                  this.classList.remove('border-transparent');
-                  this.classList.add('border-primary-500');
-              });
-          });
-      }
-  });
-</script>
-<script src="/javascript/showPageMap.js"></script>
+            // Image Gallery Logic
+            document.addEventListener('DOMContentLoaded', () => {
+                const mainImage = document.getElementById('mainImage');
+                const thumbnails = document.querySelectorAll('.thumbnail-btn');
+
+                if (mainImage && thumbnails.length > 0) {
+                    thumbnails.forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            // Thay đổi ảnh chính
+                            const newSrc = this.getAttribute('data-src');
+                            mainImage.src = newSrc;
+
+                            // Cập nhật viền cho thumbnail đang được chọn
+                            thumbnails.forEach(t => t.classList.remove('border-primary-500', 'border-transparent'));
+                            thumbnails.forEach(t => t.classList.add('border-transparent'));
+                            this.classList.remove('border-transparent');
+                            this.classList.add('border-primary-500');
+                        });
+                    });
+                }
+            });
+    </script>
+    <script src="/javascript/showPageMap.js"></script>
+    <script src="/javascript/socialInteractions.js"></script>

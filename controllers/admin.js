@@ -2,7 +2,6 @@ const User = require('../models/users');
 const Restaurant = require('../models/restaurant');
 const Review = require('../models/reviews');
 const Category = require('../models/category');
-const GeneralSetting = require('../models/generalSetting');
 const { cloudinary } = require("../cloudinary/index.js"); 
 const ExcelJS = require('exceljs'); 
 module.exports.renderRestaurants = async (req, res) => {
@@ -420,48 +419,13 @@ module.exports.dismissReport = async (req, res) => {
 // 1. Hiển thị trang Cấu hình
 module.exports.renderSettings = async (req, res) => {
     const categories = await Category.find({});
-    // Setting đã có sẵn trong res.locals nhờ middleware, nhưng lấy lại cho chắc
-    const setting = await GeneralSetting.findOne(); 
-    
+    const setting = {}; // Trống vì đã xóa tính năng này
     res.render('admin/settings', { categories, setting, active: 'settings' });
 };
 
 // 2. Cập nhật Thông tin chung (Logo, Banner...)
 module.exports.updateGeneralSettings = async (req, res) => {
-    // 1. Tìm bản ghi Setting (nếu chưa có thì tạo mới)
-    let setting = await GeneralSetting.findOne();
-    if (!setting) {
-        setting = new GeneralSetting({});
-    }
-
-    // 2. Cập nhật các thông tin văn bản (Title, Footer, Hotline...)
-    // (req.body.setting chứa các dữ liệu text từ form)
-    Object.assign(setting, req.body.setting);
-
-    // 3. Xử lý LOGO (Nếu có file upload lên)
-    if (req.files && req.files['logoFile']) {
-        // (Tùy chọn) Xóa logo cũ trên Cloudinary để tiết kiệm dung lượng
-        if (setting.logo && setting.logo.filename) {
-            await cloudinary.uploader.destroy(setting.logo.filename);
-        }
-        
-        // Lưu logo mới
-        const f = req.files['logoFile'][0];
-        setting.logo = { url: f.path, filename: f.filename };
-    }
-
-    // 4. Xử lý BANNER (Nếu có file upload lên)
-    if (req.files && req.files['bannerFile']) {
-        if (setting.banner && setting.banner.filename) {
-            await cloudinary.uploader.destroy(setting.banner.filename);
-        }
-        
-        const f = req.files['bannerFile'][0];
-        setting.banner = { url: f.path, filename: f.filename };
-    }
-
-    await setting.save();
-    req.flash('success', 'Cập nhật cấu hình thành công!');
+    req.flash('error', 'Tính năng cấu hình đã bị vô hiệu hóa!');
     res.redirect('/admin/settings');
 };
 // --- QUẢN LÝ DANH MỤC ---

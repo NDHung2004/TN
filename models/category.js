@@ -5,7 +5,7 @@ const CategorySchema = new Schema({
     name: {
         type: String,
         required: true,
-        unique: true // Đảm bảo không bị trùng tên (VD: không tạo 2 cái "Buffet")
+        unique: true
     }
 });
 

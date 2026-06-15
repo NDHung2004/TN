@@ -1,0 +1,229 @@
+<% layout('/layouts/boilerplate') %>
+
+    <div class="max-w-5xl mx-auto py-8">
+        <!-- Header Profile (Facebook Style) -->
+        <div
+            class="bg-white dark:bg-dark-card rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 mb-8">
+            <!-- Cover Photo -->
+            <div class="h-48 sm:h-64 w-full bg-gradient-to-r from-blue-500 to-purple-600 relative">
+                <!-- Default Pattern -->
+                <div class="absolute inset-0 opacity-20"
+                    style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 20px 20px;">
+                </div>
+            </div>
+
+            <div class="px-6 sm:px-10 pb-6 sm:pb-8 relative">
+                <!-- Avatar & Top Actions -->
+                <div
+                    class="flex flex-col sm:flex-row sm:items-end justify-between sm:-mt-16 gap-4 sm:gap-0 z-10 relative">
+
+                    <div class="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6">
+                        <!-- Avatar -->
+                        <div class="w-32 h-32 sm:w-40 sm:h-40 shrink-0 -mt-16 sm:mt-0">
+                            <% if (profileUser.avatar && profileUser.avatar.url && !profileUser.avatar.url.includes('default-avatar.jpg')) { %>
+                                <img src="<%= profileUser.avatar.url %>"
+                                    alt="Avatar"
+                                    class="w-full h-full object-cover rounded-full border-4 border-white dark:border-dark-card shadow-lg bg-white">
+                            <% } else { %>
+                                <div class="w-full h-full rounded-full border-4 border-white dark:border-dark-card shadow-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-6xl font-bold text-gray-500 dark:text-gray-400 uppercase">
+                                    <%= profileUser.username.charAt(0) %>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <!-- Tên User -->
+                        <div class="text-center sm:text-left mb-2 sm:mb-4">
+                            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">
+                                <%= profileUser.username %>
+                            </h1>
+                            <% if(profileUser.bio) { %>
+                                <p class="text-gray-600 dark:text-gray-400 text-sm mt-1 max-w-lg">
+                                    <%= profileUser.bio %>
+                                </p>
+                                <% } else { %>
+                                    <p class="text-gray-400 text-sm mt-1 italic">Người dùng chưa thêm tiểu sử.</p>
+                                    <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Nút Hành Động -->
+                    <div class="flex justify-center sm:justify-end mb-2 sm:mb-4">
+                        <% if(isOwner) { %>
+                            <a href="#editProfileModal"
+                                class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold rounded-lg transition-colors flex items-center gap-2">
+                                <i class="fas fa-edit"></i> Trạng thái
+                            </a>
+                            <% } else if (currentUser) { %>
+                                <button
+                                    class="btn-follow px-6 py-2.5 font-bold rounded-lg transition-colors shadow-sm <%= isFollowing ? 'bg-gray-200 text-gray-800 hover:bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700' %>"
+                                    data-user-id="<%= profileUser._id %>">
+                                    <i class="fas <%= isFollowing ? 'fa-user-check' : 'fa-user-plus' %> mr-1.5"></i>
+                                    <%= isFollowing ? 'Đang theo dõi' : 'Theo dõi' %>
+                                </button>
+                                <% } else { %>
+                                    <a href="/login"
+                                        class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-sm flex items-center gap-1.5"><i
+                                            class="fas fa-user-plus"></i> Theo dõi</a>
+                                    <% } %>
+                    </div>
+                </div>
+
+                <!-- Stats Bar -->
+                <div
+                    class="flex justify-center sm:justify-start gap-8 mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <div class="text-center sm:text-left">
+                        <span class="block text-lg font-bold text-gray-900 dark:text-white">
+                            <%= myRestaurants ? myRestaurants.length : 0 %>
+                        </span>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Quán đã đăng</span>
+                    </div>
+                    <div class="text-center sm:text-left">
+                        <span class="block text-lg font-bold text-gray-900 dark:text-white">
+                            <%= followersCount %>
+                        </span>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Người theo dõi</span>
+                    </div>
+                    <div class="text-center sm:text-left">
+                        <span class="block text-lg font-bold text-gray-900 dark:text-white">
+                            <%= followingCount %>
+                        </span>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Đang theo dõi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Cột 1: Quán Đã Đăng (My Restaurants) -->
+            <div>
+                <h3
+                    class="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+                    <i class="fas fa-store text-emerald-500 mr-2"></i> Quán Đã Đăng
+                </h3>
+                <div class="space-y-4">
+                    <% if (!isOwner && !profileUser.isPublic) { %>
+                        <div
+                            class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 text-center">
+                            <i class="fas fa-lock text-gray-400 text-2xl mb-2"></i>
+                            <p class="text-gray-500 text-sm">Danh sách quán ăn đang ở chế độ riêng tư.</p>
+                        </div>
+                        <% } else if (myRestaurants && myRestaurants.length===0) { %>
+                            <p class="text-gray-500 text-sm">Chưa đăng quán ăn nào.</p>
+                            <% } else if (myRestaurants) { %>
+                                <% myRestaurants.forEach(rest=> { %>
+                                    <a href="/restaurants/<%= rest._id %>"
+                                        class="flex items-center gap-4 bg-white dark:bg-dark-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow group">
+                                        <% if(rest.images && rest.images.length> 0) { %>
+                                            <img src="<%= rest.images[0].url %>"
+                                                class="w-16 h-16 rounded-lg object-cover">
+                                            <% } else { %>
+                                                <div
+                                                    class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
+                                                    <i class="fas fa-image text-gray-400"></i></div>
+                                                <% } %>
+                                                    <div>
+                                                        <h4
+                                                            class="font-bold text-gray-900 dark:text-white group-hover:text-primary-500 transition-colors line-clamp-1">
+                                                            <%= rest.title %>
+                                                        </h4>
+                                                        <p class="text-xs text-gray-500 line-clamp-1"><i
+                                                                class="fas fa-map-marker-alt"></i>
+                                                            <%= rest.location %>
+                                                        </p>
+                                                    </div>
+                                    </a>
+                                    <% }) %>
+                                        <% } %>
+                </div>
+            </div>
+
+            <!-- Cột 2: Quán Yêu Thích -->
+            <div>
+                <h3
+                    class="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
+                    <i class="fas fa-heart text-rose-500 mr-2"></i> Quán Đã Lưu
+                </h3>
+                <div class="space-y-4">
+                    <% if(favorites.length===0) { %>
+                        <p class="text-gray-500 text-sm">Chưa lưu quán ăn nào.</p>
+                        <% } %>
+                            <% favorites.forEach(fav=> { %>
+                                <% if(fav) { %>
+                                    <a href="/restaurants/<%= fav._id %>"
+                                        class="flex items-center gap-4 bg-white dark:bg-dark-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow group">
+                                        <% if(fav.images && fav.images.length> 0) { %>
+                                            <img src="<%= fav.images[0].url %>"
+                                                class="w-16 h-16 rounded-lg object-cover">
+                                            <% } else { %>
+                                                <div
+                                                    class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center">
+                                                    <i class="fas fa-image text-gray-400"></i></div>
+                                                <% } %>
+                                                    <div>
+                                                        <h4
+                                                            class="font-bold text-gray-900 dark:text-white group-hover:text-primary-500 transition-colors line-clamp-1">
+                                                            <%= fav.title %>
+                                                        </h4>
+                                                        <p class="text-xs text-gray-500 line-clamp-1"><i
+                                                                class="fas fa-map-marker-alt"></i>
+                                                            <%= fav.location %>
+                                                        </p>
+                                                    </div>
+                                    </a>
+                                    <% } %>
+                                        <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Chỉnh Sửa Profile (Chỉ hiện cho Chủ sở hữu) -->
+    <% if(isOwner) { %>
+        <div id="editProfileModal"
+            class="hidden target:flex fixed inset-0 z-50 items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div class="bg-white dark:bg-dark-card w-full max-w-md p-6 rounded-2xl shadow-xl relative">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Chỉnh sửa hồ sơ</h3>
+                    <a href="#_" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fas fa-times"></i></a>
+                </div>
+
+                <form action="/profile/<%= profileUser._id %>" method="POST" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ảnh đại diện (Avatar)</label>
+                        <input type="file" name="avatar" accept="image/*" class="w-full px-4 py-2 border rounded-xl bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-2 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-400">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tiểu sử
+                            (Bio)</label>
+                        <textarea name="bio" rows="3"
+                            class="w-full px-4 py-2 border rounded-xl bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-2 focus:ring-primary-500"
+                            placeholder="Viết gì đó về bạn..."><%= profileUser.bio || '' %></textarea>
+                    </div>
+
+                    <div class="mb-6 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Hồ sơ công khai</p>
+                            <p class="text-xs text-gray-500">Mọi người có thể xem bài đánh giá của bạn.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="isPublic" class="sr-only peer" <%=profileUser.isPublic
+                                ? 'checked' : '' %>>
+                            <div
+                                class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                            </div>
+                        </label>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 font-bold rounded-xl hover:opacity-90 transition-opacity">
+                        Lưu thay đổi
+                    </button>
+                </form>
+            </div>
+        </div>
+        <% } %>
+
+            <script src="/javascript/socialInteractions.js"></script>

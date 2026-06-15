@@ -14,7 +14,6 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const expressMongoSanitize = require("@exortek/express-mongo-sanitize");
 const helmet = require("helmet");
-const GeneralSetting = require('./models/generalSetting');
 const ExpressError = require("./utils/ExpressError");
 const User = require("./models/users");
 
@@ -27,18 +26,6 @@ app.use(express.urlencoded({ extended: true }));
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-app.use(async (req, res, next) => {
-    // Tìm cấu hình, nếu chưa có thì tạo mới
-    let setting = await GeneralSetting.findOne();
-    if (!setting) {
-        setting = new GeneralSetting({ siteTitle: 'Quán Ăn Việt' });
-        await setting.save();
-    }
-    
-    // Biến này sẽ dùng được ở navbar.ejs và footer.ejs
-    res.locals.generalSetting = setting; 
-    next();
-});
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
@@ -48,6 +35,10 @@ const restaurantRoutes = require("./routes/restaurants");
 const reviewRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/users");
 const adminRoutes = require('./routes/admin');
+const favoriteRoutes = require('./routes/favorites');
+const likeRoutes = require('./routes/likes');
+const dislikeRoutes = require('./routes/dislikes');
+const followRoutes = require('./routes/follows');
 mongoose.connect("mongodb://localhost:27017/yelp-camp");
 
 const db = mongoose.connection;
@@ -166,6 +157,10 @@ app.get("/fakeuser", async (req, res) => {
 
 app.use("/restaurants", restaurantRoutes);
 app.use("/restaurants/:id/reviews/", reviewRoutes);
+app.use("/restaurants/:id/favorite", favoriteRoutes);
+app.use("/reviews/:reviewId/like", likeRoutes);
+app.use("/reviews/:reviewId/dislike", dislikeRoutes);
+app.use("/users/:userId/follow", followRoutes);
 app.use("/", userRoutes);
 app.use('/admin', adminRoutes);
 app.get("/", (req, res) => {

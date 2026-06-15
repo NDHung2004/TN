@@ -1,5 +1,10 @@
 const Restaurant = require("../models/restaurant");
 const User = require('../models/users');
+const Favorite = require('../models/favorite');
+const Like = require('../models/like');
+const Dislike = require('../models/dislike');
+const Follow = require('../models/follow');
+const Interaction = require('../models/interaction');
 const mbxGeocode = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapboxToken = process.env.MAPBOX_TOKEN;
 const geocoder = mbxGeocode({ accessToken: mapboxToken });
@@ -151,9 +156,84 @@ module.exports.index = async (req, res) => {
     const allRestaurantsForMap = await Restaurant.find(mapQuery, 'geometry title location description')
                                                  .sort(sortObj);
 
+    // --- BẮT ĐẦU: LOGIC GỢI Ý (RECOMMENDATION) ---
+    let recommendedRestaurants = [];
+    if (req.user && page === 1 && !search && (!lat || !lng)) {
+        try {
+            // Lấy tương tác của user
+            const interactions = await Interaction.find({ user: req.user._id }).populate('restaurant');
+            
+            // Tính điểm danh mục (Category Score)
+            let categoryScores = {};
+            for (let inter of interactions) {
+                if (inter.restaurant && inter.restaurant.category) {
+                    const cat = inter.restaurant.category;
+                    if (!categoryScores[cat]) categoryScores[cat] = 0;
+                    categoryScores[cat] += inter.weight || 1;
+                }
+            }
+            
+            // Sắp xếp lấy Top 2 Danh mục
+            let sortedCategories = Object.keys(categoryScores).sort((a, b) => categoryScores[b] - categoryScores[a]);
+            let topCategories = sortedCategories.slice(0, 2);
+            
+            if (topCategories.length > 0) {
+                // Lấy các quán user đã tương tác để loại trừ
+                let interactedRestIds = interactions.map(i => i.restaurant ? i.restaurant._id : null).filter(id => id != null);
+
+                let recQuery = {
+                    status: 'approved',
+                    category: { $in: topCategories },
+                    _id: { $nin: interactedRestIds }
+                };
+
+                // Lấy 8 quán gợi ý tiềm năng
+                let rawRecommended = await Restaurant.find(recQuery)
+                    .populate('reviews')
+                    .limit(8);
+
+                // Chấm điểm từng quán gợi ý (Scoring Algorithm)
+                let scoredRecommended = [];
+                for (let camp of rawRecommended) {
+                    let obj = camp.toObject({ virtuals: true });
+                    let positiveRatio = 0;
+                    let avgRating = 0;
+                    
+                    if (camp.reviews && camp.reviews.length > 0) {
+                        let totalRating = 0;
+                        let positiveCount = 0;
+                        for (let r of camp.reviews) {
+                            if (r.rating) totalRating += r.rating;
+                            if (r.sentiment === 'positive') positiveCount++;
+                        }
+                        avgRating = totalRating / camp.reviews.length;
+                        positiveRatio = (positiveCount / camp.reviews.length);
+                    }
+                    
+                    obj.avgRating = avgRating;
+                    obj.reviewCount = camp.reviews ? camp.reviews.length : 0;
+                    obj.positiveRatio = Math.round(positiveRatio * 100);
+                    
+                    // Công thức điểm gợi ý: dựa trên Rating (max 5) và Tỉ lệ Tích cực (max 1.0)
+                    obj.recommendationScore = (avgRating * 5) + (positiveRatio * 25); 
+                    
+                    scoredRecommended.push(obj);
+                }
+
+                // Sắp xếp giảm dần theo recommendationScore và cắt lấy 4 quán tốt nhất
+                scoredRecommended.sort((a, b) => b.recommendationScore - a.recommendationScore);
+                recommendedRestaurants = scoredRecommended.slice(0, 4);
+            }
+        } catch (e) {
+            console.error("Lỗi thuật toán gợi ý: ", e);
+        }
+    }
+    // --- KẾT THÚC: LOGIC GỢI Ý ---
+
     // 6. Trả về giao diện
     res.render('restaurants/index', { 
         restaurants: processedRestaurants, 
+        recommendedRestaurants, 
         currentPage: page, 
         totalPages, 
         allRestaurantsForMap,
@@ -192,6 +272,7 @@ module.exports.showRestaurant = async (req, res) => {
     // Tìm quán ăn và lấy danh sách review
     const restaurant = await Restaurant.findById(req.params.id).populate({
         path: 'reviews',
+        options: { sort: { likeCount: -1, createdAt: -1 } },
         populate: { path: 'author' }
     }).populate('author');
 
@@ -222,8 +303,31 @@ module.exports.showRestaurant = async (req, res) => {
     };
     // ----------------------------
 
-    // Truyền thêm aiStats vào view
-    res.render('restaurants/show', { restaurant, aiStats });
+    let isFavorited = false;
+    let isFollowing = false;
+    let userLikes = []; // Mảng chứa ID các review mà user này đã like
+    let userDislikes = []; // Mảng chứa ID các review mà user này đã dislike
+    
+    if (req.user) {
+        // Kiểm tra xem đã lưu chưa
+        const fav = await Favorite.findOne({ user: req.user._id, restaurant: restaurant._id });
+        if (fav) isFavorited = true;
+        
+        // Kiểm tra xem đã theo dõi tác giả chưa
+        const fol = await Follow.findOne({ follower: req.user._id, following: restaurant.author._id });
+        if (fol) isFollowing = true;
+        
+        // Kiểm tra các review đã like / dislike
+        const reviewIds = restaurant.reviews.map(r => r._id);
+        const likes = await Like.find({ user: req.user._id, review: { $in: reviewIds } });
+        userLikes = likes.map(l => l.review.toString());
+
+        const dislikes = await Dislike.find({ user: req.user._id, review: { $in: reviewIds } });
+        userDislikes = dislikes.map(d => d.review.toString());
+    }
+
+    // Truyền thêm aiStats, isFavorited, isFollowing, userLikes, userDislikes vào view
+    res.render('restaurants/show', { restaurant, aiStats, isFavorited, isFollowing, userLikes, userDislikes });
 }
 
 module.exports.renderEditForm = async (req, res) => {
@@ -269,24 +373,6 @@ module.exports.deleteRestaurant = async (req, res) => {
     res.redirect('/restaurants');
 }
 
-module.exports.toggleFavorite = async (req, res) => {
-    const { id } = req.params;
-    const user = await User.findById(req.user._id);
-
-    
-    if (user.favorites.includes(id)) {
-       
-        await User.findByIdAndUpdate(req.user._id, {
-            $pull: { favorites: id }
-        });
-        req.flash('success', 'Đã xóa khỏi danh sách yêu thích!');
-    } else {
-        await User.findByIdAndUpdate(req.user._id, {
-            $addToSet: { favorites: id }
-        });
-        req.flash('success', 'Đã thêm vào danh sách yêu thích!');
-    }
-    res.redirect(req.get('Referrer') || '/restaurants');
-};
+// toggleFavorite đã được chuyển sang controllers/favorites.js
 
 

@@ -1,0 +1,208 @@
+2.2.5 Use case Tìm kiếm quán ăn
+Usecase: UC005 – Use case Tìm kiếm quán ăn
+Mục đích:  Giúp người dùng tra cứu và tìm ra các địa điểm ẩm thực phù hợp với nhu cầu cụ thể của bản thân một cách nhanh chóng.
+Mô tả: Người dùng nhập từ khóa vào thanh tìm kiếm (có thể là tên quán, địa danh khu vực, hoặc tên món ăn). Hệ thống sẽ lọc trong cơ sở dữ liệu và trả về danh sách các quán ăn có chứa từ khóa tương ứng.
+Tác nhân: Tất cả người dùng (Khách, Thành viên, Kiểm duyệt viên, Quản trị viên).
+Tiền điều kiện:  Hệ thống đang hoạt động và người dùng đang ở một trang có chứa thanh công cụ tìm kiếm 
+Hậu điều kiện: Trả về danh sách quán ăn đã được lọc theo từ khóa của người dùng.
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Click vào thanh tìm kiếm, nhập từ khóa	
+2. Nhấn phím Enter	
+	3. Tiếp nhận từ khóa, thực hiện truy vấn lọc dữ liệu (Filter) trên CSDL dựa vào tên quán, mô tả, hoặc địa điểm khớp với từ khóa.
+	4. Cập nhật lại giao diện danh sách quán ăn và bản đồ chỉ hiển thị những kết quả thỏa mãn điều kiện tìm kiếm.
+Luồng sự kiện thay thế:
+	3.1. Nếu từ khóa tìm kiếm không khớp với bất kỳ dữ liệu nào trong hệ thống, giao diện danh sách trả về rỗng và hệ thống hiển thị thông báo
+3.2. Xóa từ khóa cũ và nhập lại từ khóa mới.	
+2.2.6 Use case Quản lý thông tin cá nhân
+Usecase: UC006 – Use case Quản lý thông tin cá nhân
+Mục đích:  Cho phép người dùng cập nhật thông tin hồ sơ cá nhân hoặc thay đổi mật khẩu để bảo mật tài khoản.
+Mô tả: Người dùng truy cập trang Tài khoản cá nhân, chỉnh sửa các trường thông tin cho phép (Tên hiển thị, Email, Ảnh đại diện) hoặc nhập mật khẩu cũ và mật khẩu mới để đổi mật khẩu.
+Tác nhân: Tất cả người dùng (Khách, Thành viên, Kiểm duyệt viên, Quản trị viên).
+Tiền điều kiện:  Người dùng đã đăng nhập vào hệ thống.
+Hậu điều kiện: Thông tin tài khoản mới hoặc mật khẩu mới được cập nhật thành công vào cơ sở dữ liệu.
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Truy cập vào mục "Tài khoản của tôi".	
+2. Nhập thông tin thay đổi và nhấn "Cập nhật".	
+	3. Kiểm tra tính hợp lệ của dữ liệu
+	4. Cập nhật thông tin vào cơ sở dữ liệu.
+	5. Hiển thị thông báo "Cập nhật thành công" và tải lại trang.
+Luồng sự kiện thay thế:
+	3.1. Nếu nhập sai mật khẩu cũ, hoặc mật khẩu mới quá ngắn/không khớp nhau, hệ thống từ chối cập nhật và hiển thị thông báo lỗi
+3.2. Sửa lại thông tin cho hợp lệ và nhấn "Cập nhật" lần nữa.	
+2.2.7 Use case Đăng quán ăn mới
+Usecase: UC007 – Use case Đăng quán ăn mới
+Mục đích:  Người dùng đóng góp một địa điểm ẩm thực mới lên hệ thống bản đồ cộng đồng.
+Mô tả: Người dùng điền đầy đủ các thông tin: Tên quán, Địa chỉ, Mô tả, và tải lên một hoặc nhiều hình ảnh. Hệ thống sẽ tự động định vị tọa độ địa chỉ và lưu trữ ảnh trên đám mây.
+Tác nhân:  Thành viên đã đăng nhập.
+Tiền điều kiện:   Người dùng đã đăng nhập.
+Hậu điều kiện: Quán ăn được tạo thành công (Có thể hiển thị ngay lập tức hoặc ở trạng thái "Chờ duyệt" tùy cấu hình hệ thống).
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Nhấn nút "Thêm quán mới" trên thanh điều hướng.	
+2. Điền thông tin (Tên, Địa chỉ, Mô tả, Giá tiền) và chọn upload hình ảnh.	
+3. Nhấn "Đăng quán".	
+	4. Tải hình ảnh lên Cloudinary. Chuyển đổi Địa chỉ thành Tọa độ bản đồ.
+	5. Lưu toàn bộ dữ liệu vào cơ sở dữ liệu và gắn ID tác giả là người dùng hiện tại.
+	6. Chuyển hướng người dùng đến trang Chi tiết của quán vừa đăng kèm thông báo thành công.
+Luồng sự kiện thay thế:
+	4.1. Nếu bỏ trống các trường bắt buộc (Tên quán, Địa chỉ) hoặc tải lên file không phải định dạng hình ảnh , hệ thống chặn lại và báo lỗi.
+	4.2. Nếu địa chỉ nhập vào hoàn toàn không có thực hoặc dịch vụ bản đồ lỗi, hệ thống hiển thị thông báo
+4.3. Chỉnh sửa lại form hoặc chọn ảnh khác và nhấn "Đăng quán".	
+
+
+
+2.2.8 Use case Quản lý quán ăn đã đăng
+Usecase: UC008 – Use case Quản lý quán ăn đã đăng
+Mục đích:  Giúp tác giả cập nhật lại thông tin khi quán có sự thay đổi 
+Mô tả: Tại trang chi tiết quán ăn do mình đăng, người dùng nhấn nút "Sửa" để cập nhật thông tin/hình ảnh, hoặc nhấn nút "Xóa" để gỡ bài đăng khỏi hệ thống.
+Tác nhân: Tác giả (Người đã đăng bài quán ăn đó) hoặc Quản trị viên.
+Tiền điều kiện:  Người dùng đang đăng nhập bằng đúng tài khoản đã tạo bài đăng đó.
+Hậu điều kiện: Thông tin quán được cập nhật hoặc bài đăng quán ăn bị xóa khỏi cơ sở dữ liệu.
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Truy cập trang chi tiết quán ăn do mình tạo, nhấn nút "Sửa".	
+2. Chỉnh sửa thông tin trên form, thêm ảnh mới hoặc xóa ảnh cũ, nhấn "Cập nhật".	
+	3. Kiểm tra quyền sở hữu
+	4. Cập nhật dữ liệu mới
+
+.	5. Chuyển hướng về trang chi tiết kèm thông báo cập nhật thành công.
+Luồng sự kiện thay thế:
+	2.1. Nếu xóa hết thông tin bắt buộc trong form sửa, hệ thống sẽ báo lỗi không cho phép cập nhật.
+	2.2. Nếu quán ăn đó đã bị Quản trị viên xóa trước đó, khi người dùng cố gắng vào form sửa sẽ nhận được trang lỗi (Không tìm thấy).
+2.3. Sửa lại các trường bị trống và gửi lại.	
+
+2.2.9 Use case Đánh giá và bình luận
+Usecase: UC009 – Use case Đánh giá và bình luận
+Mục đích:  Người dùng chia sẻ trải nghiệm, nhận xét về chất lượng món ăn, phục vụ của quán.
+Mô tả: Người dùng kéo xuống phần đánh giá tại trang chi tiết quán, chọn số sao (từ 1 đến 5 sao) và nhập nội dung bình luận bằng chữ, sau đó gửi.
+Tác nhân: Thành viên đã đăng nhập.
+Tiền điều kiện:  Người dùng đã đăng nhập và đang ở trang chi tiết của một quán ăn.
+Hậu điều kiện: Bình luận và số sao được hiển thị công khai trên trang chi tiết quán. Điểm trung bình của quán được cập nhật.
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Cuộn đến phần "Đánh giá", click chọn số sao và nhập khung nội dung chữ.	
+2. Nhấn nút "Gửi đánh giá".	
+	3. Xác thực dữ liệu không rỗng và số sao hợp lệ (1-5).
+	4. Lưu đánh giá vào CSDL, liên kết đánh giá với tài khoản người dùng và quán ăn.
+	5. Tải lại trang chi tiết, hiển thị đánh giá mới nhất lên đầu danh sách.
+Luồng sự kiện thay thế:
+	3.1. Nếu người dùng nhấn "Gửi" nhưng không chọn số sao hoặc bỏ trống khung nội dung, hệ thống sẽ chặn form và highlight màu đỏ yêu cầu: "Vui lòng chọn mức độ đánh giá và viết nhận xét".
+3.2. Bổ sung số sao hoặc nội dung rồi gửi lại.	
+
+2.2.10 Use case Lưu quán yêu thích
+Usecase: UC010 – Use case Lưu quán yêu thích
+Mục đích:  Người dùng lưu trữ các địa điểm muốn đi hoặc yêu thích để dễ dàng xem lại sau này.
+Mô tả: Tại trang danh sách hoặc trang chi tiết, người dùng nhấn vào biểu tượng "Trái tim". Quán ăn sẽ được thêm vào danh sách "Đã lưu" cá nhân. Nhấn lần nữa để bỏ lưu.
+Tác nhân: Thành viên đã đăng nhập.
+Tiền điều kiện:  Người dùng đã đăng nhập.
+Hậu điều kiện: Không
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Nhấn vào biểu tượng "Trái tim" trên ảnh của quán ăn.	
+	2. Gửi yêu cầu lưu qua hệ thống 
+	3. Kiểm tra
+	4. Trả về kết quả
+Luồng sự kiện thay thế:
+	
+2.1. Nếu đường truyền mạng của người dùng bị gián đoạn khi nhấn nút, API gửi ngầm thất bại, hệ thống hiển thị thông báo popup nhỏ: "Lỗi kết nối, không thể lưu. Vui lòng thử lại"
+2.2. Kiểm tra mạng và nhấn nút lại.	
+
+2.2.11 Use case Báo cáo
+Usecase: UC011 – Use case Báo cáo
+Mục đích:  Giúp cộng đồng tự làm sạch nội dung bằng cách báo cáo các bình luận tiêu cực, spam, quảng cáo rác.
+Mô tả: Khi thấy một bình luận xấu, người dùng nhấn nút "Báo cáo" bên cạnh bình luận đó. Hệ thống sẽ ghi nhận và gửi thông báo cho Kiểm duyệt viên/Quản trị viên xử lý.
+Tác nhân: Thành viên đã đăng nhập.
+Tiền điều kiện:  Người dùng đã đăng nhập và bình luận đó không phải do chính người dùng viết.
+Hậu điều kiện: Không
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Nhấn biểu tượng "Báo cáo / Lá cờ" cạnh bình luận vi phạm.	
+2. (Tùy chọn) Chọn lý do báo cáo trong hộp thoại hiện lên và nhấn "Gửi báo cáo".	
+	3. Cập nhật trường dữ liệu
+	4. Hiển thị thông báo
+5. Xem thông tin, lướt xem hình ảnh và đọc bình luận.	
+Luồng sự kiện thay thế:
+
+2.2.12 Use case Quản lý bài đăng
+Usecase: UC012 – Use case Quán lý bài đăng
+Mục đích:  Giúp quản trị viên kiểm soát chất lượng nội dung các địa điểm ẩm thực được người dùng đăng tải lên hệ thống.
+Mô tả: Quản trị viên truy cập trang Quản lý Quán ăn trên Dashboard. Tại đây, họ có thể xem danh sách, duyệt/từ chối các bài đăng mới, xóa các bài đăng vi phạm hoặc ghim các quán ăn nổi bật lên trang chủ.
+Tác nhân: Quản trị viên, Kiểm duyệt viên.
+Tiền điều kiện:  Người dùng đã đăng nhập với tài khoản có quyền Quản trị viên hoặc Kiểm duyệt viên.
+Hậu điều kiện: Không
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Truy cập vào mục "Quản lý Quán ăn" trên menu Dashboard.	
+	2. Truy xuất cơ sở dữ liệu và hiển thị bảng danh sách các bài đăng
+3. Click nút "Duyệt" (hoặc "Xóa", "Ghim") tương ứng trên một bài đăng.	
+	4. Ghi nhận thao tác, kiểm tra quyền hạn của tài khoản đang thao tác.
+	5. Cập nhật trạng thái bài đăng trong cơ sở dữ liệu và thông báo.
+Luồng sự kiện thay thế:
+
+2.2.13 Use case Quản lý bình luận
+Usecase: UC013 – Use case Quản lý bình luận
+Mục đích:  Xử lý các bình luận tiêu cực, spam, làm sạch môi trường tương tác của cộng đồng và giải quyết các báo cáo.
+Mô tả: Quản trị viên truy cập mục Quản lý Bình luận. Họ có thể xem toàn bộ các bình luận, lọc các bình luận đang "Bị báo cáo". Sau đó thực hiện xóa bỏ hoàn toàn hoặc "Gỡ báo cáo" nếu bình luận đó không vi phạm.
+Tác nhân: Quản trị viên, Kiểm duyệt viên.
+Tiền điều kiện:  Người dùng đã đăng nhập với quyền Quản trị viên hoặc Kiểm duyệt viên.
+Hậu điều kiện: Không
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Truy cập vào mục "Quản lý Bình luận" trên Dashboard.	
+	2. Nhấn nút "Xóa" đối với bình luận vi phạm hoặc "Gỡ báo cáo" nếu bình luận hợp lệ.
+	4. Cập nhật lại số điểm đánh giá trung bình của quán ăn chứa bình luận đó (nếu bình luận bị xóa).
+	5. Hiện thông báo thao tác thành công.
+Luồng sự kiện thay thế:
+
+2.2.14 Use case Quản lý người dùng
+Usecase: UC014 – Use case Quản lý người dùng
+Mục đích:  Quản lý toàn bộ thông tin tài khoản, duy trì kỷ luật hệ thống bằng cách phân quyền và xử lý tài khoản vi phạm.
+Mô tả: Quản trị viên vào trang Quản lý Người dùng, xem danh sách toàn bộ tài khoản. Quản trị viên có thể nâng cấp quyền cho tài khoản hoặc Khóa/ Mở khóa các tài khoản.
+Tác nhân: Quản trị viên
+Tiền điều kiện:  Người dùng đăng nhập bằng tài khoản có quyền Quản trị viên.
+Hậu điều kiện: Không
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Truy cập vào mục "Quản lý Người dùng".	
+2. Tìm kiếm người dùng và nhấn nút "Khóa tài khoản" hoặc thay đổi "Quyền" trong danh sách.	
+	3. Cập nhật
+	4. Nếu khóa tài khoản, hệ thống tự động hủy các phiên đăng nhập hiện tại (Session) của User đó nếu họ đang online.
+	
+5. Trả về thông báo thành công.
+
+Luồng sự kiện thay thế:
+	3.1. Nếu Admin cố gắng tự "Khóa tài khoản" chính mình, hệ thống sẽ chặn và cảnh báo: "Bạn không thể khóa chính mình".
+
+2.2.15 Use case Quản lý danh mục
+Usecase: UC015 – Use case Quản lý danh mục
+Mục đích:  Thiết lập và quản lý các thể loại quán ăn. 
+Mô tả: Thêm mới một danh mục, sửa tên danh mục hiện có hoặc xóa các danh mục không cần thiết.
+Tác nhân: Quản trị viên
+Tiền điều kiện:  Người dùng đăng nhập bằng tài khoản có quyền Admin.
+Hậu điều kiện: không
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Truy cập "Quản lý Danh mục", điền tên vào ô "Thêm danh mục" và nhấn "Tạo".	
+	2. Kiểm tra xem tên danh mục này đã tồn tại chưa.
+	3. Lưu danh mục mới
+	4. Tải lại danh sách danh mục và hiển thị thông báo
+Luồng sự kiện thay thế:
+	2.1. Nếu Admin điền trùng tên danh mục đã có hệ thống báo lỗi
+	3.1. (Trường hợp Xóa) Nếu Admin xóa một danh mục đang có rất nhiều quán ăn được liên kết với nó, hệ thống hiển thị Popup xác nhận kép cảnh báo: "Các quán ăn thuộc danh mục này sẽ bị mất phân loại. Bạn có chắc chắn xóa?".
+
+2.2.16 Use case Xem Dashboard
+Usecase: UC016 – Use case Xem Dashboard
+Mục đích:  Cung cấp cái nhìn toàn cảnh về tình trạng hoạt động của nền tảng, bao gồm cả phân tích cảm xúc để đánh giá chất lượng quán ăn.
+Ngay khi Admin đăng nhập vào khu vực quản trị, hệ thống hiển thị giao diện Dashboard gồm các thẻ số lượng tổng (Tổng user, tổng bài đăng) và các biểu đồ (Biểu đồ tăng trưởng, Biểu đồ thống kê tỷ lệ Đánh giá Tích cực / Tiêu cực).
+Tác nhân: Admin
+Tiền điều kiện: Đăng nhập với quyền quản trị.
+Hậu điều kiện: Không
+Luồng sự kiện chính 
+Người dùng	Hệ thống
+1. Click vào "Dashboard" trên thanh menu	
+	2. Truy xuất Cơ sở dữ liệu
+	3. Hiển thị dữ liệu và các biểu đồ trực quan
+Luồng sự kiện thay thế:
+
