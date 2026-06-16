@@ -43,12 +43,36 @@ const sampleReviews = [
     { body: "Đồ ăn ra nhanh, nóng hổi, rất ngon miệng.", rating: 4 }
 ];
 
+const cities = [
+    { name: "Hà Nội", coordinates: [105.8544, 21.0285] },
+    { name: "Hồ Chí Minh", coordinates: [106.6297, 10.8231] },
+    { name: "Đà Nẵng", coordinates: [108.2022, 16.0544] },
+    { name: "Hải Phòng", coordinates: [106.6881, 20.8449] },
+    { name: "Cần Thơ", coordinates: [105.7806, 10.0452] },
+    { name: "Nha Trang, Khánh Hòa", coordinates: [109.1967, 12.2388] },
+    { name: "Huế, Thừa Thiên Huế", coordinates: [107.5905, 16.4637] },
+    { name: "Hội An, Quảng Nam", coordinates: [108.3248, 15.8801] },
+    { name: "Đà Lạt, Lâm Đồng", coordinates: [108.4583, 11.9404] },
+    { name: "Vũng Tàu, Bà Rịa - Vũng Tàu", coordinates: [107.0749, 10.3460] },
+    { name: "Hạ Long, Quảng Ninh", coordinates: [107.0865, 20.9599] },
+    { name: "Quy Nhơn, Bình Định", coordinates: [109.2201, 13.7750] },
+    { name: "Phan Thiết, Bình Thuận", coordinates: [108.1009, 10.9255] },
+    { name: "Sapa, Lào Cai", coordinates: [103.8436, 22.3361] },
+    { name: "Phú Quốc, Kiên Giang", coordinates: [103.9667, 10.2167] },
+    { name: "Biên Hòa, Đồng Nai", coordinates: [106.8167, 10.9500] },
+    { name: "Buôn Ma Thuột, Đắk Lắk", coordinates: [108.0382, 12.6667] },
+    { name: "Thái Nguyên", coordinates: [105.8368, 21.5942] },
+    { name: "Vinh, Nghệ An", coordinates: [105.6667, 18.6667] },
+    { name: "Nam Định", coordinates: [106.1683, 20.4300] }
+];
+
 const random = (array) => array[Math.floor(Math.random() * array.length)];
 const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-// Tọa độ Việt Nam (Kinh độ: 102 - 109, Vĩ độ: 8 - 23)
-const randomCoordinates = () => [
-    102 + Math.random() * 7,
-    8 + Math.random() * 15
+
+// Tọa độ lệch một chút so với trung tâm thành phố (khoảng vài km)
+const getNearbyCoordinates = (coords) => [
+    coords[0] + (Math.random() * 0.04 - 0.02), // xê dịch kinh độ
+    coords[1] + (Math.random() * 0.04 - 0.02)  // xê dịch vĩ độ
 ];
 
 const seedDB = async () => {
@@ -68,17 +92,19 @@ const seedDB = async () => {
     for (let i = 0; i < 300; i++) {
         const title = `${random(sampleTitles)} - CN ${i + 1}`;
         
+        const city = random(cities);
+        
         const restaurant = new Restaurant({
             author: author._id,
             title: title,
-            location: "Việt Nam",
+            location: `${city.name}, Việt Nam`,
             description: random(sampleDescriptions),
             price: randomInt(30000, 200000),
             status: "approved",
             views: randomInt(10, 1000),
             geometry: {
                 type: "Point",
-                coordinates: randomCoordinates()
+                coordinates: getNearbyCoordinates(city.coordinates)
             },
             images: [
                 {

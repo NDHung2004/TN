@@ -30,7 +30,7 @@ async def analyze_text(data: ReviewData):
         elif label == "NEG":
             sentiment = "negative"
             
-        # Tích hợp bộ lọc từ ngữ thô tục (Kết hợp Cấp độ 1 vào đây cho nhẹ máy)
+        # Tích hợp bộ lọc từ ngữ thô tục 
         toxic_words = ["dm", "vcl", "ngu", "chó", "rác rưởi", "đĩ", "mẹ mày", "địt"]
         text_lower = data.text.lower()
         is_toxic = any(word in text_lower for word in toxic_words)

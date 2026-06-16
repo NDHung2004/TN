@@ -411,6 +411,10 @@
                             <h4 class="font-bold text-gray-900 dark:text-white text-base mb-1 line-clamp-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"><%= sim.title %></h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mb-2 mt-auto">
                                 <i class="fas fa-map-marker-alt mr-1"></i> <%= sim.location %>
+                                <% if (sim.dist && sim.dist.calculated) { %>
+                                    <span class="text-gray-400 mx-1">•</span>
+                                    <span class="text-blue-600 dark:text-blue-400 font-medium whitespace-nowrap"><%= (sim.dist.calculated / 1000).toFixed(1) %> km</span>
+                                <% } %>
                             </p>
                         </div>
                     </a>

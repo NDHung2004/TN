@@ -176,8 +176,32 @@ module.exports.index = async (req, res) => {
 
     // --- BẮT ĐẦU: LOGIC GỢI Ý (RECOMMENDATION) ---
     let recommendedRestaurants = [];
+    // Ẩn gợi ý nếu đang tìm kiếm theo lat/lng (Nearby Search)
     if (req.user && page === 1 && !search && (!lat || !lng)) {
         try {
+            let userLatRaw = req.query.userLat;
+            let userLngRaw = req.query.userLng;
+            
+            // Lấy từ cookie nếu có
+            if ((!userLatRaw || !userLngRaw) && req.headers.cookie) {
+                const cookies = req.headers.cookie.split(';').reduce((acc, cookie) => {
+                    const [key, value] = cookie.trim().split('=');
+                    acc[key] = value;
+                    return acc;
+                }, {});
+                if (cookies.userLat) userLatRaw = cookies.userLat;
+                if (cookies.userLng) userLngRaw = cookies.userLng;
+            }
+
+            if (userLatRaw && typeof userLatRaw === 'string') userLatRaw = userLatRaw.replace('_', '.');
+            if (userLngRaw && typeof userLngRaw === 'string') userLngRaw = userLngRaw.replace('_', '.');
+
+            let parsedUserLat = parseFloat(userLatRaw);
+            let parsedUserLng = parseFloat(userLngRaw);
+            let hasUserLocation = !isNaN(parsedUserLat) && !isNaN(parsedUserLng) && 
+                                  parsedUserLat >= -90 && parsedUserLat <= 90 && 
+                                  parsedUserLng >= -180 && parsedUserLng <= 180;
+
             // Lấy tương tác của user
             const interactions = await Interaction.find({ user: req.user._id }).populate('restaurant');
             
@@ -205,6 +229,18 @@ module.exports.index = async (req, res) => {
                     _id: { $nin: interactedRestIds }
                 };
 
+                if (hasUserLocation) {
+                    recQuery.geometry = {
+                        $near: {
+                            $geometry: {
+                                type: "Point",
+                                coordinates: [parsedUserLng, parsedUserLat]
+                            },
+                            $maxDistance: 50000
+                        }
+                    };
+                }
+
                 // Lấy 8 quán gợi ý tiềm năng
                 let rawRecommended = await Restaurant.find(recQuery)
                     .populate('reviews')
@@ -231,6 +267,20 @@ module.exports.index = async (req, res) => {
                     obj.avgRating = avgRating;
                     obj.reviewCount = camp.reviews ? camp.reviews.length : 0;
                     obj.positiveRatio = Math.round(positiveRatio * 100);
+                    
+                    if (hasUserLocation) {
+                        const R = 6371e3;
+                        const lat1 = parsedUserLat * Math.PI/180;
+                        const lat2 = obj.geometry.coordinates[1] * Math.PI/180;
+                        const dLat = (obj.geometry.coordinates[1]-parsedUserLat) * Math.PI/180;
+                        const dLng = (obj.geometry.coordinates[0]-parsedUserLng) * Math.PI/180;
+                        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                                  Math.cos(lat1) * Math.cos(lat2) *
+                                  Math.sin(dLng/2) * Math.sin(dLng/2);
+                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                        const d = R * c;
+                        obj.dist = { calculated: d };
+                    }
                     
                     // Công thức điểm gợi ý: dựa trên Rating (max 5) và Tỉ lệ Tích cực (max 1.0)
                     obj.recommendationScore = (avgRating * 5) + (positiveRatio * 25); 
@@ -350,7 +400,13 @@ module.exports.showRestaurant = async (req, res) => {
     const rawSimilarRestaurants = await Restaurant.find({ 
         category: restaurant.category, 
         _id: { $ne: restaurant._id },
-        status: 'approved'
+        status: 'approved',
+        geometry: {
+            $near: {
+                $geometry: restaurant.geometry,
+                $maxDistance: 50000
+            }
+        }
     }).populate('reviews').limit(4);
 
     let similarRestaurants = [];
@@ -367,6 +423,19 @@ module.exports.showRestaurant = async (req, res) => {
             obj.avgRating = 0;
             obj.reviewCount = 0;
         }
+
+        const R = 6371e3;
+        const lat1 = restaurant.geometry.coordinates[1] * Math.PI/180;
+        const lat2 = obj.geometry.coordinates[1] * Math.PI/180;
+        const dLat = (obj.geometry.coordinates[1]-restaurant.geometry.coordinates[1]) * Math.PI/180;
+        const dLng = (obj.geometry.coordinates[0]-restaurant.geometry.coordinates[0]) * Math.PI/180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1) * Math.cos(lat2) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const d = R * c;
+        obj.dist = { calculated: d };
+
         similarRestaurants.push(obj);
     }
     // ----------------------------------------------

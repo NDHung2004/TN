@@ -28,8 +28,7 @@
                 <!-- Autocomplete Dropdown -->
                 <div id="autocompleteDropdown"
                     class="hidden absolute top-full left-0 mt-1 w-full bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-[100] overflow-hidden p-3">
-                    <ul id="autocompleteList"
-                        class="flex flex-wrap gap-2">
+                    <ul id="autocompleteList" class="flex flex-wrap gap-2">
                         <!-- Danh sách gợi ý sẽ được chèn vào đây -->
                     </ul>
                 </div>
@@ -123,6 +122,13 @@
                                             <span>
                                                 <%= restaurant.location %>
                                             </span>
+                                            <% if (restaurant.dist && restaurant.dist.calculated) { %>
+                                                <span class="text-gray-400 mx-1">•</span>
+                                                <span
+                                                    class="text-blue-600 dark:text-blue-400 font-medium whitespace-nowrap">
+                                                    <%= (restaurant.dist.calculated / 1000).toFixed(1) %> km
+                                                </span>
+                                                <% } %>
                                         </p>
 
                                         <!-- Statistics Badges -->
@@ -140,7 +146,7 @@
                                                     class="inline-flex items-center px-2 py-1 rounded text-xs font-medium <%= restaurant.positiveRatio >= 50 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' %>"
                                                     title="Tỉ lệ tích cực">
                                                     <i
-                                                        class="fas <%= restaurant.positiveRatio >= 50 ? 'fa-thumbs-up text-emerald-500' : 'fa-thumbs-down text-rose-500' %> mr-1"></i>
+                                                        class="fas fa-thumbs-up <%= restaurant.positiveRatio >= 50 ? 'text-emerald-500' : 'text-rose-500' %> mr-1"></i>
                                                     <%= Math.round(restaurant.positiveRatio) %>%
                                                 </span>
                                                 <% } %>
@@ -190,17 +196,19 @@
                                                 <% } %>
                                         </div>
                                         <div class="flex items-center">
-                                            <div class="text-sm font-bold text-gray-900 dark:text-white truncate max-w-[120px]">
+                                            <div
+                                                class="text-sm font-bold text-gray-900 dark:text-white truncate max-w-[120px]">
                                                 <%= user.username %>
                                             </div>
                                             <% if(user.isVerified) { %>
                                                 <div class="ml-1 flex-shrink-0">
                                                     <%- include('../partials/verifiedBadge') %>
                                                 </div>
-                                            <% } %>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400 ml-2 whitespace-nowrap">
-                                                • <%= user.followersCount || 0 %> người theo dõi
-                                            </div>
+                                                <% } %>
+                                                    <div
+                                                        class="text-xs text-gray-500 dark:text-gray-400 ml-2 whitespace-nowrap">
+                                                        • <%= user.followersCount || 0 %> người theo dõi
+                                                    </div>
                                         </div>
                                     </a>
                                     <% } %>
@@ -277,7 +285,8 @@
                                                             : 'Chưa có' %>
                                                             <% if(restaurant.reviewCount) { %> <span
                                                                     class="ml-1 text-yellow-600/70 dark:text-yellow-500/70">(
-                                                                    <%= restaurant.reviewCount %>)</span>
+                                                                    <%= restaurant.reviewCount %>)
+                                                                </span>
                                                                 <% } %>
                                                     </span>
                                                     <% if (restaurant.positiveRatio !==undefined &&
@@ -287,7 +296,7 @@
                                                             class="inline-flex items-center px-2 py-1 rounded text-xs font-medium <%= restaurant.positiveRatio >= 50 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' %>"
                                                             title="Tỉ lệ tích cực">
                                                             <i
-                                                                class="fas <%= restaurant.positiveRatio >= 50 ? 'fa-thumbs-up text-emerald-500' : 'fa-thumbs-down text-rose-500' %> mr-1"></i>
+                                                                class="fas fa-thumbs-up <%= restaurant.positiveRatio >= 50 ? 'text-emerald-500' : 'text-rose-500' %> mr-1"></i>
                                                             <%= Math.round(restaurant.positiveRatio) %>%
                                                         </span>
                                                         <% } %>
@@ -458,6 +467,28 @@
                                                 document.addEventListener('click', function (e) {
                                                     if (!searchInput.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
                                                         autocompleteDropdown.classList.add('hidden');
+                                                    }
+                                                });
+                                            </script>
+
+                                            <!-- Tự động hỏi vị trí để tính khoảng cách cho phần Gợi ý -->
+                                            <script>
+                                                document.addEventListener("DOMContentLoaded", () => {
+                                                    const urlParams = new URLSearchParams(window.location.search);
+                                                    if (!document.cookie.includes('userLat=') && !document.cookie.includes('locationDenied=true') && !urlParams.has('search') && navigator.geolocation) {
+                                                        navigator.geolocation.getCurrentPosition(
+                                                            (position) => {
+                                                                const latStr = position.coords.latitude.toString().replace('.', '_');
+                                                                const lngStr = position.coords.longitude.toString().replace('.', '_');
+                                                                document.cookie = `userLat=${latStr}; path=/; max-age=360`;
+                                                                document.cookie = `userLng=${lngStr}; path=/; max-age=360`;
+                                                                window.location.reload();
+                                                            },
+                                                            (error) => {
+                                                                document.cookie = `locationDenied=true; path=/; max-age=360`;
+                                                                console.log("Người dùng từ chối cấp quyền vị trí hoặc có lỗi: ", error);
+                                                            }
+                                                        );
                                                     }
                                                 });
                                             </script>
