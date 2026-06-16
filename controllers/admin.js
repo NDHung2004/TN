@@ -307,6 +307,25 @@ module.exports.toggleBan = async (req, res) => {
     res.redirect(redirectUrl);
 };
 
+// 2.5 Cấp / Thu hồi tích xanh (Toggle Verified)
+module.exports.toggleVerify = async (req, res) => {
+    const { id } = req.params;
+    const { page, search } = req.query; 
+
+    const user = await User.findById(id);
+    
+    user.isVerified = !user.isVerified;
+    await user.save();
+    
+    let redirectUrl = `/admin/users?page=${page || 1}`;
+    if (search) redirectUrl += `&search=${search}`;
+    redirectUrl += `#user-row-${id}`;
+
+    const msg = user.isVerified ? 'Đã cấp tích xanh cho người dùng!' : 'Đã thu hồi tích xanh!';
+    req.flash('success', msg);
+    res.redirect(redirectUrl);
+};
+
 // 3. Thay đổi vai trò (Role Assignment)
 module.exports.updateRole = async (req, res) => {
     const { id } = req.params;

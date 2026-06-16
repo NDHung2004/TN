@@ -139,7 +139,12 @@
                                         <div class="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 mr-2">
                                             <%= camp.author ? camp.author.username[0].toUpperCase() : '?' %>
                                         </div>
-                                        <span class="text-sm text-gray-700 dark:text-gray-300"><%= camp.author ? camp.author.username : 'Unknown' %></span>
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                                            <%= camp.author ? camp.author.username : 'Unknown' %>
+                                            <% if(camp.author && camp.author.isVerified) { %>
+                                                <%- include('../partials/verifiedBadge') %>
+                                            <% } %>
+                                        </span>
                                     </div>
                                 </td>
 

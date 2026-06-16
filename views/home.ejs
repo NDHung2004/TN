@@ -109,7 +109,7 @@
                             Đăng ký
                         </a>
                         <% } else { %>
-                            <span class="text-sm font-medium text-white/80">Chào, <%= currentUser.username %>!</span>
+                            <span class="text-sm font-medium text-white/80">Chào, <%= currentUser.username %><% if(currentUser.isVerified) { %><%- include('partials/verifiedBadge') %><% } %>!</span>
                             <a href="/logout"
                                 class="text-sm font-medium text-red-300 hover:text-red-400 transition-colors">Đăng
                                 xuất</a>

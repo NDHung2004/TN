@@ -37,6 +37,10 @@ const UserSchema = new Schema({
     isPublic: {
         type: Boolean,
         default: false
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 UserSchema.plugin(passwordLocalMongoose);

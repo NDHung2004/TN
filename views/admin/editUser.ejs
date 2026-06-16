@@ -25,7 +25,12 @@
                     <%= user.username.charAt(0).toUpperCase() %>
                 </div>
                 <div>
-                    <div class="text-sm font-bold text-gray-900 dark:text-white"><%= user.username %></div>
+                    <div class="text-sm font-bold text-gray-900 dark:text-white">
+                        <%= user.username %>
+                        <% if(user.isVerified) { %>
+                            <%- include('../partials/verifiedBadge') %>
+                        <% } %>
+                    </div>
                     <div class="text-xs text-gray-500 dark:text-gray-400"><%= user.email %></div>
                 </div>
             </div>

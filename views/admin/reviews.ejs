@@ -64,7 +64,12 @@
                                         <div class="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 mr-2">
                                             <%= review.author ? review.author.username[0].toUpperCase() : '?' %>
                                         </div>
-                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300"><%= review.author ? review.author.username : 'Unknown' %></span>
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            <%= review.author ? review.author.username : 'Unknown' %>
+                                            <% if(review.author && review.author.isVerified) { %>
+                                                <%- include('../partials/verifiedBadge') %>
+                                            <% } %>
+                                        </span>
                                     </div>
                                 </td>
 

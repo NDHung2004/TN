@@ -35,6 +35,9 @@
                         <div class="text-center sm:text-left mb-2 sm:mb-4">
                             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">
                                 <%= profileUser.username %>
+                                <% if(profileUser.isVerified) { %>
+                                    <%- include('../partials/verifiedBadge') %>
+                                <% } %>
                             </h1>
                             <% if(profileUser.bio) { %>
                                 <p class="text-gray-600 dark:text-gray-400 text-sm mt-1 max-w-lg">

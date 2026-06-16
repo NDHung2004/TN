@@ -72,6 +72,9 @@
                                             </div>
                                             <span class="text-sm font-medium text-gray-700 dark:text-gray-200">
                                                 <%= currentUser.username %>
+                                                <% if(currentUser.isVerified) { %>
+                                                    <%- include('../partials/verifiedBadge') %>
+                                                <% } %>
                                             </span>
                                             <i
                                                 class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600 transition-colors"></i>
@@ -151,6 +154,9 @@
                         </div>
                         <span class="text-base font-medium text-gray-900 dark:text-white">
                             <%= currentUser.username %>
+                            <% if(currentUser.isVerified) { %>
+                                <%- include('../partials/verifiedBadge') %>
+                            <% } %>
                         </span>
                     </div>
                     <a href="/profile/<%= currentUser._id %>"

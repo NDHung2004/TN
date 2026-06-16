@@ -14,6 +14,9 @@ router.get('/users', isLoggedIn, isAdmin, adminController.renderUsers);
 // 2. Khóa tài khoản
 router.patch('/users/:id/ban', isLoggedIn, isAdmin, adminController.toggleBan);
 
+// 2.5 Cấp / Thu hồi tích xanh
+router.patch('/users/:id/verify', isLoggedIn, isAdmin, adminController.toggleVerify);
+
 // 3. Đổi quyền (Role)
 router.patch('/users/:id/role', isLoggedIn, isAdmin, adminController.updateRole);
 

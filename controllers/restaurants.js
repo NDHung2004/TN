@@ -40,6 +40,7 @@ module.exports.index = async (req, res) => {
     // --- Mặc định chỉ lấy bài 'approved' ---
     let dbQuery = { status: 'approved' }; 
 
+    let matchedUsers = [];
     if (search) {
         const regex = new RegExp(escapeRegex(search), 'gi');
         // Kết hợp điều kiện: Phải là 'approved' VÀ (khớp tên HOẶC khớp mô tả...)
@@ -51,6 +52,14 @@ module.exports.index = async (req, res) => {
                 { description: regex }, 
             ]
         };
+        
+        // Tìm user khớp với từ khóa
+        let users = await User.find({ username: regex }).limit(10).lean();
+        const Follow = require('../models/follow');
+        for (let u of users) {
+            u.followersCount = await Follow.countDocuments({ following: u._id });
+        }
+        matchedUsers = users;
     }
 
     let parsedLat = parseFloat(lat);
@@ -249,7 +258,8 @@ module.exports.index = async (req, res) => {
         search,
         lat,
         lng,
-        sortMode: sort || 'nearest'
+        sortMode: sort || 'nearest',
+        matchedUsers
     });
 };
 

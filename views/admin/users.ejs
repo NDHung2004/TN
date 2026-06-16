@@ -60,7 +60,12 @@
                                             <%= user.username[0].toUpperCase() %>
                                         </div>
                                         <div class="ml-4">
-                                            <div class="text-sm font-bold text-gray-900 dark:text-white"><%= user.username %></div>
+                                            <div class="text-sm font-bold text-gray-900 dark:text-white">
+                                                <%= user.username %>
+                                                <% if(user.isVerified) { %>
+                                                    <%- include('../partials/verifiedBadge') %>
+                                                <% } %>
+                                            </div>
                                             <div class="text-sm text-gray-500 dark:text-gray-400"><%= user.email %></div>
                                         </div>
                                     </div>
@@ -111,6 +116,19 @@
                                         <a href="/admin/users/<%= user._id %>/edit" class="p-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 rounded-lg transition-colors" title="Phân quyền / Sửa">
                                             <i class="fas fa-user-cog"></i>
                                         </a>
+
+                                        <!-- Toggle Verified -->
+                                        <form action="/admin/users/<%= user._id %>/verify?_method=PATCH&page=<%= typeof currentPage !== 'undefined' ? currentPage : 1 %><%= typeof search !== 'undefined' && search ? `&search=${search}` : '' %>" method="POST" class="inline-block">
+                                            <% if(user.isVerified) { %>
+                                                <button type="submit" class="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-lg transition-colors" title="Thu hồi tích xanh">
+                                                    <i class="fas fa-certificate"></i>
+                                                </button>
+                                            <% } else { %>
+                                                <button type="submit" class="p-2 text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400 bg-gray-50 hover:bg-blue-50 dark:bg-gray-800 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Cấp tích xanh">
+                                                    <i class="fas fa-certificate"></i>
+                                                </button>
+                                            <% } %>
+                                        </form>
 
                                         <!-- Ban/Unban -->
                                         <% if(!user._id.equals(currentUser._id)) { %>

@@ -143,3 +143,23 @@ module.exports.updateProfile = async (req, res) => {
     req.flash('success', 'Đã cập nhật trang cá nhân!');
     res.redirect(`/profile/${id}`);
 };
+
+module.exports.searchUsers = async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) return res.json([]);
+        
+        const users = await User.find({ 
+            username: { $regex: q, $options: 'i' } 
+        }).select('username avatar isVerified').limit(5).lean();
+        
+        const Follow = require('../models/follow');
+        for (let u of users) {
+            u.followersCount = await Follow.countDocuments({ following: u._id });
+        }
+        
+        res.json(users);
+    } catch (e) {
+        res.status(500).json({ error: 'Lỗi tìm kiếm người dùng' });
+    }
+};
