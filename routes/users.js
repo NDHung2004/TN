@@ -27,6 +27,7 @@ router.get('/favorites', isLoggedIn, users.renderFavorites);
 
 // Profile routes
 router.get('/api/search', catchAsync(users.searchUsers));
+router.get('/api/profile/:id/:type', catchAsync(users.getProfileData));
 router.get('/profile/:id', users.renderProfile);
 router.post('/profile/:id', isLoggedIn, upload.single('avatar'), catchAsync(users.updateProfile));
 

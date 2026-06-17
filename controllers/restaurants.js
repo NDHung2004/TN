@@ -103,6 +103,7 @@ module.exports.index = async (req, res) => {
 
     let restaurants = await Restaurant.find(dbQuery)
         .populate('reviews')
+        .populate('category')
         .sort(sortObj) 
         .skip(skip)
         .limit(limit);
@@ -172,6 +173,7 @@ module.exports.index = async (req, res) => {
     // 5. Lấy dữ liệu cho bản đồ
     let mapQuery = { ...countQuery }; // map cũng không nên dùng $near nếu không thực sự cần limit/sort
     const allRestaurantsForMap = await Restaurant.find(mapQuery, 'geometry title location description')
+                                                 .populate('category')
                                                  .sort(sortObj);
 
     // --- BẮT ĐẦU: LOGIC GỢI Ý (RECOMMENDATION) ---
@@ -244,6 +246,7 @@ module.exports.index = async (req, res) => {
                 // Lấy 8 quán gợi ý tiềm năng
                 let rawRecommended = await Restaurant.find(recQuery)
                     .populate('reviews')
+                    .populate('category')
                     .limit(8);
 
                 // Chấm điểm từng quán gợi ý (Scoring Algorithm)
@@ -327,10 +330,6 @@ module.exports.createRestaurant = async (req, res, next) => {
     author: req.user._id,
     createdAt: { $gte: startOfDay, $lte: endOfDay }
   });
-  if (count >= 5) {
-    req.flash("error", "Bạn chỉ có thể đăng tối đa 5 bài đăng trong một ngày!");
-    return res.redirect("/restaurants/new");
-  }
 
   const optimizedQuery = getOptimizedLocationQuery(req.body.restaurant.location);
   const geoData = await geocoder
@@ -345,9 +344,16 @@ module.exports.createRestaurant = async (req, res, next) => {
   }));
 
   restaurant.author = req.user._id;
-  await restaurant.save();
 
-  req.flash("success", "Đã tạo quán ăn mới thành công!");
+  if (count < 5) {
+    restaurant.status = 'approved';
+    req.flash("success", "Đã tạo quán ăn mới thành công!");
+  } else {
+    restaurant.status = 'pending';
+    req.flash("success", "Đã gửi thông tin thành công! Do bạn đã đăng hơn 5 quán trong ngày, bài viết này đang chờ admin duyệt.");
+  }
+
+  await restaurant.save();
   res.redirect(`/restaurants/${restaurant._id}`);
 };
 
@@ -357,7 +363,7 @@ module.exports.showRestaurant = async (req, res) => {
         path: 'reviews',
         options: { sort: { likeCount: -1, createdAt: -1 } },
         populate: { path: 'author' }
-    }).populate('author');
+    }).populate('author').populate('category');
 
     if (!restaurant) {
         req.flash('error', 'Không tìm thấy quán ăn!');
@@ -411,7 +417,7 @@ module.exports.showRestaurant = async (req, res) => {
 
     // --- TÌM CÁC QUÁN ĂN TƯƠNG TỰ CÙNG DANH MỤC ---
     const rawSimilarRestaurants = await Restaurant.find({ 
-        category: restaurant.category, 
+        category: restaurant.category ? restaurant.category._id : null, 
         _id: { $ne: restaurant._id },
         status: 'approved',
         geometry: {
@@ -420,7 +426,7 @@ module.exports.showRestaurant = async (req, res) => {
                 $maxDistance: 50000
             }
         }
-    }).populate('reviews').limit(4);
+    }).populate('reviews').populate('category').limit(4);
 
     let similarRestaurants = [];
     for (let camp of rawSimilarRestaurants) {
@@ -459,7 +465,7 @@ module.exports.showRestaurant = async (req, res) => {
 
 module.exports.renderEditForm = async (req, res) => {
   const { id } = req.params;
-  const restaurant = await Restaurant.findById(id);
+  const restaurant = await Restaurant.findById(id).populate('category');
   if (!restaurant) {
     req.flash("error", "Không tìm thấy quán ăn!");
     return res.redirect("/restaurants");

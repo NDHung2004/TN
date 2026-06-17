@@ -105,7 +105,7 @@
                     class="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
                     <i class="fas fa-store text-emerald-500 mr-2"></i> Quán Đã Đăng
                 </h3>
-                <div class="space-y-4">
+                <div class="space-y-4" id="myRestaurantsList">
                     <% if (!isOwner && !profileUser.isPublic) { %>
                         <div
                             class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 text-center">
@@ -140,6 +140,10 @@
                                     <% }) %>
                                         <% } %>
                 </div>
+                <div id="myRestaurantsLoader" class="hidden text-center py-4">
+                    <i class="fas fa-spinner fa-spin text-primary-500 text-xl"></i>
+                </div>
+                <div id="myRestaurantsEnd" class="hidden text-center py-4 text-sm text-gray-500">Đã tải hết danh sách quán ăn!</div>
             </div>
 
             <!-- Cột 2: Quán Yêu Thích -->
@@ -148,7 +152,7 @@
                     class="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-800 pb-2">
                     <i class="fas fa-heart text-rose-500 mr-2"></i> Quán Đã Lưu
                 </h3>
-                <div class="space-y-4">
+                <div class="space-y-4" id="favoritesList">
                     <% if(favorites.length===0) { %>
                         <p class="text-gray-500 text-sm">Chưa lưu quán ăn nào.</p>
                         <% } %>
@@ -178,6 +182,10 @@
                                     <% } %>
                                         <% }) %>
                 </div>
+                <div id="favoritesLoader" class="hidden text-center py-4">
+                    <i class="fas fa-spinner fa-spin text-rose-500 text-xl"></i>
+                </div>
+                <div id="favoritesEnd" class="hidden text-center py-4 text-sm text-gray-500">Đã tải hết danh sách yêu thích!</div>
             </div>
         </div>
     </div>
@@ -230,3 +238,83 @@
         <% } %>
 
             <script src="/javascript/socialInteractions.js"></script>
+
+            <!-- Infinite Scroll Script -->
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const profileId = '<%= profileUser._id %>';
+                    
+                    function setupInfiniteScroll(listId, loaderId, endId, type) {
+                        const list = document.getElementById(listId);
+                        const loader = document.getElementById(loaderId);
+                        const endMessage = document.getElementById(endId);
+                        if (!list) return;
+
+                        let page = 2; // Bắt đầu load từ trang 2 vì trang 1 đã render bằng EJS
+                        let isLoading = false;
+                        let hasMore = true;
+
+                        const observer = new IntersectionObserver((entries) => {
+                            if (entries[0].isIntersecting && !isLoading && hasMore) {
+                                loadMore();
+                            }
+                        }, { rootMargin: '100px' });
+
+                        // Theo dõi phần tử loader
+                        observer.observe(loader);
+
+                        // Mặc định hiện loader để observer bắt nếu danh sách ngắn
+                        if(hasMore && list.children.length >= 5) loader.classList.remove('hidden');
+
+                        async function loadMore() {
+                            isLoading = true;
+                            loader.classList.remove('hidden');
+
+                            try {
+                                const response = await fetch(`/api/profile/${profileId}/${type}?page=${page}`);
+                                const data = await response.json();
+
+                                if (data.length === 0) {
+                                    hasMore = false;
+                                    loader.classList.add('hidden');
+                                    endMessage.classList.remove('hidden');
+                                    return;
+                                }
+
+                                data.forEach(item => {
+                                    const imgHtml = (item.images && item.images.length > 0) 
+                                        ? `<img src="${item.images[0].url}" class="w-16 h-16 rounded-lg object-cover">`
+                                        : `<div class="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center"><i class="fas fa-image text-gray-400"></i></div>`;
+                                    
+                                    const a = document.createElement('a');
+                                    a.href = `/restaurants/${item._id}`;
+                                    a.className = 'flex items-center gap-4 bg-white dark:bg-dark-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow group mt-4';
+                                    a.innerHTML = `
+                                        ${imgHtml}
+                                        <div>
+                                            <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-primary-500 transition-colors line-clamp-1">${item.title}</h4>
+                                            <p class="text-xs text-gray-500 line-clamp-1"><i class="fas fa-map-marker-alt"></i> ${item.location}</p>
+                                        </div>
+                                    `;
+                                    list.appendChild(a);
+                                });
+
+                                page++;
+                            } catch (error) {
+                                console.error('Error loading more:', error);
+                            } finally {
+                                isLoading = false;
+                                // Nếu trả về dưới 5 item, nghĩa là đã hết trang
+                                if (hasMore && data.length < 5) {
+                                    hasMore = false;
+                                    loader.classList.add('hidden');
+                                    endMessage.classList.remove('hidden');
+                                }
+                            }
+                        }
+                    }
+
+                    setupInfiniteScroll('myRestaurantsList', 'myRestaurantsLoader', 'myRestaurantsEnd', 'restaurants');
+                    setupInfiniteScroll('favoritesList', 'favoritesLoader', 'favoritesEnd', 'favorites');
+                });
+            </script>

@@ -64,7 +64,7 @@
                         >
                             <% if(typeof categories !== 'undefined' && categories.length > 0) { %>
                                 <% for(let cat of categories) { %>
-                                    <option value="<%= cat.name %>" <%= restaurant.category === cat.name ? 'selected' : '' %>><%= cat.name %></option>
+                                    <option value="<%= cat._id %>" <%= (restaurant.category && restaurant.category._id.toString() === cat._id.toString()) ? 'selected' : '' %>><%= cat.name %></option>
                                 <% } %>
                             <% } else { %>
                                 <option value="Khác" selected>Khác</option>

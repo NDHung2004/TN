@@ -40,5 +40,5 @@ async def analyze_text(data: ReviewData):
 
     except Exception as e:
         return {"sentiment": "neutral", "isToxic": False, "error": str(e)}
-
-# Cách chạy server này: .\venv\Scripts\Activate.ps1 uvicorn main:app --port 8000
+#
+#  .\venv\Scripts\Activate.ps1 uvicorn main:app --port 8000

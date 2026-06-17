@@ -218,6 +218,14 @@ module.exports.index = async (req, res) => {
         .select('title reviews views');
 
     // Phân bổ danh mục
+    const allCategories = await Category.find({});
+    const categoryMap = {};
+    for (let cat of allCategories) {
+        categoryMap[cat._id.toString()] = { name: cat.name, count: 0 };
+    }
+    const KHAC_KEY = 'Khác';
+    categoryMap[KHAC_KEY] = { name: 'Khác', count: 0 };
+
     const categoryDistribution = await Restaurant.aggregate([
         { $match: dateFilter },
         {
@@ -227,8 +235,18 @@ module.exports.index = async (req, res) => {
             }
         }
     ]);
-    const catLabels = categoryDistribution.map(c => c._id || 'Khác');
-    const catData = categoryDistribution.map(c => c.count);
+    
+    categoryDistribution.forEach(c => {
+        const catId = c._id ? c._id.toString() : null;
+        if (catId && categoryMap[catId]) {
+            categoryMap[catId].count += c.count;
+        } else {
+            categoryMap[KHAC_KEY].count += c.count;
+        }
+    });
+
+    const catLabels = Object.values(categoryMap).map(c => c.name);
+    const catData = Object.values(categoryMap).map(c => c.count);
 
     // Render ra view và truyền dữ liệu
     res.render('admin/index', {
@@ -463,15 +481,15 @@ module.exports.renderCategories = async (req, res) => {
 // 2. Thêm Danh mục mới
 module.exports.createCategory = async (req, res) => {
     try {
-        const { name } = req.body;
-        // Kiểm tra xem đã tồn tại chưa (dù Model có unique nhưng check thêm cho chắc)
+        const { name, description } = req.body;
+        // Kiểm tra xem đã tồn tại chưa
         const existingCat = await Category.findOne({ name });
         if(existingCat) {
             req.flash('error', 'Danh mục này đã tồn tại!');
             return res.redirect('/admin/categories');
         }
 
-        const category = new Category({ name });
+        const category = new Category({ name, description });
         await category.save();
         req.flash('success', 'Đã thêm danh mục mới thành công!');
         res.redirect('/admin/categories');
@@ -484,8 +502,13 @@ module.exports.createCategory = async (req, res) => {
 // 3. Xóa Danh mục
 module.exports.deleteCategory = async (req, res) => {
     const { id } = req.params;
-    await Category.findByIdAndDelete(id);
-    req.flash('success', 'Đã xóa danh mục!');
+    const category = await Category.findById(id);
+    if (category) {
+        // Cập nhật tất cả các quán ăn đang dùng danh mục này thành null (tương đương Khác)
+        await Restaurant.updateMany({ category: category._id }, { $unset: { category: "" } });
+        await Category.findByIdAndDelete(id);
+    }
+    req.flash('success', 'Đã xóa danh mục và cập nhật các quán ăn liên quan!');
     res.redirect('/admin/categories');
 };
 

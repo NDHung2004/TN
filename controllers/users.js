@@ -76,7 +76,7 @@ module.exports.renderProfile = async (req, res) => {
     // Lấy quán ăn đã tạo nếu là chủ sở hữu HOẶC tài khoản công khai
     let myRestaurants = [];
     if (isOwner || targetUser.isPublic) {
-        myRestaurants = await Restaurant.find({ author: targetUser._id });
+        myRestaurants = await Restaurant.find({ author: targetUser._id }).limit(5);
     }
 
     // Đếm Follow
@@ -91,8 +91,8 @@ module.exports.renderProfile = async (req, res) => {
         return revObj;
     }));
 
-    // Lấy Favorite
-    const favs = await Favorite.find({ user: targetUser._id }).populate('restaurant');
+    // Lấy Favorite (giới hạn 5)
+    const favs = await Favorite.find({ user: targetUser._id }).populate('restaurant').limit(5);
     const favorites = favs.map(f => f.restaurant);
 
     // Kiểm tra follow
@@ -161,5 +161,42 @@ module.exports.searchUsers = async (req, res) => {
         res.json(users);
     } catch (e) {
         res.status(500).json({ error: 'Lỗi tìm kiếm người dùng' });
+    }
+};
+
+module.exports.getProfileData = async (req, res) => {
+    try {
+        const { id, type } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+
+        const targetUser = await User.findById(id);
+        if (!targetUser) return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+        
+        let data = [];
+        
+        if (type === 'restaurants') {
+            const isOwner = req.user && req.user._id.equals(targetUser._id);
+            if (isOwner || targetUser.isPublic) {
+                data = await Restaurant.find({ author: targetUser._id })
+                    .skip(skip)
+                    .limit(limit)
+                    .lean(); 
+            }
+        } else if (type === 'favorites') {
+            const favs = await Favorite.find({ user: targetUser._id })
+                .populate('restaurant')
+                .skip(skip)
+                .limit(limit);
+            
+            data = favs.map(f => f.restaurant).filter(r => r != null);
+        } else {
+            return res.status(400).json({ error: 'Loại dữ liệu không hợp lệ' });
+        }
+        
+        res.json(data);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
 };

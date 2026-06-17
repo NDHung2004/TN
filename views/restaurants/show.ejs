@@ -52,7 +52,7 @@
                             <span
                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
                                 <i class="fas fa-tag mr-1.5"></i>
-                                <%= restaurant.category || 'Ẩm thực' %>
+                                <%= restaurant.category?.name || 'Ẩm thực' %>
                             </span>
                             <span class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400">
                                 <i class="fas fa-user-circle mr-1.5 text-gray-400"></i>

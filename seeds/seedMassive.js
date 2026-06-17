@@ -31,16 +31,16 @@ const sampleDescriptions = [
 ];
 
 const sampleReviews = [
-    { body: "Món ăn quá tuyệt vời, chắc chắn sẽ quay lại!", rating: 5 },
-    { body: "Phục vụ hơi chậm nhưng đồ ăn ngon nên thông cảm được.", rating: 4 },
-    { body: "Giá cả hợp lý, không gian sạch sẽ thoáng mát.", rating: 5 },
-    { body: "Nước dùng hơi mặn so với khẩu vị của mình.", rating: 3 },
-    { body: "Thịt hơi dai, hy vọng quán cải thiện thêm.", rating: 2 },
-    { body: "Tuyệt đỉnh ẩm thực! Mọi thứ đều hoàn hảo.", rating: 5 },
-    { body: "Bình thường, không có gì quá đặc sắc.", rating: 3 },
-    { body: "Quá tệ, thái độ nhân viên không tốt.", rating: 1 },
-    { body: "Sẽ giới thiệu cho bạn bè và người thân đến thử.", rating: 5 },
-    { body: "Đồ ăn ra nhanh, nóng hổi, rất ngon miệng.", rating: 4 }
+    { body: "Món ăn quá tuyệt vời, chắc chắn sẽ quay lại!", rating: 5, sentiment: 'positive', isToxic: false },
+    { body: "Phục vụ hơi chậm nhưng đồ ăn ngon nên thông cảm được.", rating: 4, sentiment: 'positive', isToxic: false },
+    { body: "Giá cả hợp lý, không gian sạch sẽ thoáng mát.", rating: 5, sentiment: 'positive', isToxic: false },
+    { body: "Nước dùng hơi mặn so với khẩu vị của mình.", rating: 3, sentiment: 'neutral', isToxic: false },
+    { body: "Thịt hơi dai, hy vọng quán cải thiện thêm.", rating: 2, sentiment: 'negative', isToxic: false },
+    { body: "Tuyệt đỉnh ẩm thực! Mọi thứ đều hoàn hảo.", rating: 5, sentiment: 'positive', isToxic: false },
+    { body: "Bình thường, không có gì quá đặc sắc.", rating: 3, sentiment: 'neutral', isToxic: false },
+    { body: "Quá tệ, thái độ nhân viên không tốt. dm làm ăn như cut.", rating: 1, sentiment: 'negative', isToxic: true },
+    { body: "Sẽ giới thiệu cho bạn bè và người thân đến thử.", rating: 5, sentiment: 'positive', isToxic: false },
+    { body: "Đồ ăn ra nhanh, nóng hổi, rất ngon miệng.", rating: 4, sentiment: 'positive', isToxic: false }
 ];
 
 const cities = [
@@ -80,12 +80,33 @@ const seedDB = async () => {
     try { await db.collection('campgrounds').drop(); } catch (e) {}
     try { await Restaurant.deleteMany({}); } catch (e) {}
     try { await Review.deleteMany({}); } catch (e) {}
+    
+    const Category = require('../models/category');
+    try { await Category.deleteMany({}); } catch (e) {}
 
-    // Lấy một user bất kỳ làm tác giả (Nếu không có thì tự tạo 1 admin)
-    let author = await User.findOne({});
+    const defaultCategories = [
+        { name: "Buffer", description: "Ăn thỏa thích không giới hạn" },
+        { name: "Lẩu nướng", description: "Các món lẩu và đồ nướng BBQ" },
+        { name: "Nhà hàng", description: "Không gian sang trọng, món ăn đa dạng" },
+        { name: "Quán nhậu", description: "Địa điểm tụ tập, lai rai cuối tuần" },
+        { name: "Bình dân", description: "Quán ăn sinh viên, giá rẻ" },
+        { name: "Ăn vặt", description: "Trà sữa, bánh tráng, đồ ăn nhẹ" },
+        { name: "Đồ uống", description: "Cà phê, sinh tố, nước ép" },
+        { name: "Khác", description: "Chưa phân loại" }
+    ];
+    
+    let createdCategories = [];
+    for (let cat of defaultCategories) {
+        const nc = new Category(cat);
+        await nc.save();
+        createdCategories.push(nc);
+    }
+
+    // Cố định tạo hoặc lấy tài khoản admin làm tác giả
+    let author = await User.findOne({ username: 'admin' });
     if (!author) {
-        author = new User({ email: 'admin@gmail.com', username: 'admin' });
-        await User.register(author, 'admin123');
+        author = new User({ email: 'admin@gmail.com', username: 'admin', role: 'admin' });
+        await User.register(author, '123');
     }
 
     console.log("Seeding 300 restaurants...");
@@ -116,7 +137,7 @@ const seedDB = async () => {
                     filename: "FoodReview/sample2",
                 }
             ],
-            category: random(["Phở", "Bún", "Cơm", "Lẩu", "Nướng", "Hải Sản", "Ăn Vặt"])
+            category: random(createdCategories)._id
         });
 
         // Tạo 5 reviews cho mỗi quán
@@ -125,6 +146,8 @@ const seedDB = async () => {
             const review = new Review({
                 body: reviewData.body,
                 rating: reviewData.rating,
+                sentiment: reviewData.sentiment,
+                isToxic: reviewData.isToxic,
                 author: author._id,
                 status: "approved"
             });

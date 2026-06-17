@@ -31,8 +31,8 @@ const RestaurantSchema = new Schema(
       },
     },
     category: {
-      type: String,
-      default: 'Khác'
+      type: Schema.Types.ObjectId,
+      ref: 'Category'
     },
     author: {
       type: Schema.Types.ObjectId,

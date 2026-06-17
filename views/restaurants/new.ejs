@@ -59,7 +59,7 @@
                                 <% if(typeof categories !=='undefined' && categories.length> 0) { %>
                                     <option value="" disabled selected>-- Chọn loại hình --</option>
                                     <% for(let cat of categories) { %>
-                                        <option value="<%= cat.name %>">
+                                        <option value="<%= cat._id %>">
                                             <%= cat.name %>
                                         </option>
                                         <% } %>

@@ -31,6 +31,10 @@
                                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Tên loại hình</label>
                                 <input type="text" name="name" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors" placeholder="VD: Buffet, Lẩu nướng..." required>
                             </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Mô tả</label>
+                                <textarea name="description" rows="2" class="block w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors" placeholder="Mô tả ngắn gọn..."></textarea>
+                            </div>
                             <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors">
                                 <i class="fas fa-save mr-2"></i> Lưu danh mục
                             </button>
@@ -64,10 +68,15 @@
                         <% for(let cat of categories) { %>
                             <li class="px-6 py-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold mr-4">
+                                    <div class="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold mr-4 shrink-0">
                                         <%= cat.name[0].toUpperCase() %>
                                     </div>
-                                    <span class="font-bold text-gray-900 dark:text-white text-lg"><%= cat.name %></span>
+                                    <div>
+                                        <span class="font-bold text-gray-900 dark:text-white text-lg block"><%= cat.name %></span>
+                                        <% if(cat.description) { %>
+                                            <span class="text-sm text-gray-500 dark:text-gray-400 block"><%= cat.description %></span>
+                                        <% } %>
+                                    </div>
                                 </div>
                                 
                                 <form action="/admin/categories/<%= cat._id %>?_method=DELETE" method="POST" class="inline-block" onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh mục [<%= cat.name %>] không? Việc này có thể ảnh hưởng đến các quán ăn đang dùng danh mục này.');">
