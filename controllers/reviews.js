@@ -3,6 +3,16 @@ const Review = require("../models/reviews");
 const { analyzeReview } = require('../utils/aiAnalyzer');
 module.exports.createReview = async (req, res) => {
   const restaurant = await Restaurant.findById(req.params.id);
+
+  const userReviewCount = await Review.countDocuments({
+    author: req.user._id,
+    _id: { $in: restaurant.reviews }
+  });
+  if (userReviewCount >= 10) {
+    req.flash('error', 'Bạn chỉ có thể đăng tối đa 10 bình luận cho mỗi quán!');
+    return res.redirect(`/restaurants/${restaurant._id}`);
+  }
+
   const review = new Review(req.body.review);
   review.author = req.user._id;
   // Gửi nội dung bình luận cho AI và đợi kết quả (mất khoảng 1-2 giây)

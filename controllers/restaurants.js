@@ -319,6 +319,19 @@ module.exports.renderNewForm = async (req, res) => {
 }
 
 module.exports.createRestaurant = async (req, res, next) => {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+  const count = await Restaurant.countDocuments({
+    author: req.user._id,
+    createdAt: { $gte: startOfDay, $lte: endOfDay }
+  });
+  if (count >= 5) {
+    req.flash("error", "Bạn chỉ có thể đăng tối đa 5 bài đăng trong một ngày!");
+    return res.redirect("/restaurants/new");
+  }
+
   const optimizedQuery = getOptimizedLocationQuery(req.body.restaurant.location);
   const geoData = await geocoder
     .forwardGeocode({ query: optimizedQuery, limit: 1, countries: ['vn'], language: ['vi'] })
